@@ -18,7 +18,8 @@
 
     <script>
         $(function() {
-            $('input[name=taskDate]').datepicker();
+            $('input[name=taskDate]').datepicker({ dateFormat: 'dd/mm/yy' });
+            $('input[name=deadLine]').datepicker({ dateFormat: 'dd/mm/yy' });
         });
     </script>
 
