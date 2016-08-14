@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="proton2 (generated)" id="1471176942749-1">
+        <createSequence sequenceName="hibernate_sequence"/>
+    </changeSet>
+    <changeSet author="proton2 (generated)" id="1471176942749-2">
+        <createSequence sequenceName="usertable_id_seq"/>
+    </changeSet>
+    <changeSet author="proton2 (generated)" id="1471176942749-3">
+        <createSequence sequenceName="worktask_id_seq"/>
+    </changeSet>
+    <changeSet author="proton2 (generated)" id="1471176942749-4">
+        <createTable tableName="usertable">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="usertablePK"/>
+            </column>
+            <column name="caption" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="firstname" type="VARCHAR(255)"/>
+            <column name="lastname" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="proton2 (generated)" id="1471176942749-5">
+        <createTable tableName="worktask">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="worktaskpk"/>
+            </column>
+            <column name="caption" type="VARCHAR(255)"/>
+            <column name="deadline" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="taskcontext" type="VARCHAR(255)"/>
+            <column name="taskdate" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="taskuser_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="proton2 (generated)" id="1471176942749-6">
+        <addForeignKeyConstraint baseColumnNames="taskuser_id" baseTableName="worktask" constraintName="FK_oam3n63solk5k7h80o8lqimrh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="usertable"/>
+    </changeSet>
+</databaseChangeLog>
