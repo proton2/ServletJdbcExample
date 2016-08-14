@@ -41,12 +41,6 @@
 		</td>
 	</tr>
 	<tr>
-    	    <td>TextArea</td>
-    	    <td>
-    	        <textarea name="textarea1" rows="5" cols="27"></textarea>
-    	    </td>
-    </tr>
-	<tr>
 		<td></td>
 		<td>
 		    <input type = "submit" value = "Submit" />
