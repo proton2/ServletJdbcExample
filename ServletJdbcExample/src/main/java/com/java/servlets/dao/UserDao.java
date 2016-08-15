@@ -1,6 +1,7 @@
 package com.java.servlets.dao;
 
 import com.java.servlets.model.User;
+import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
 
 import java.sql.*;
@@ -13,6 +14,8 @@ public class UserDao implements ModelDao<User>{
 	private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=? where id=?";
 	private String getAllSql = "select * from usertable";
 	private String getUserSql = "select * from usertable where id = ?";
+	
+	private String getUserWorkTasks = "select * from WorkTask where taskuser_id = ?";
 	
 	private Connection connection;
 	
@@ -105,4 +108,29 @@ public class UserDao implements ModelDao<User>{
         }
 		return user;
 	}
+	
+    public List<WorkTask> getUserWorkTasks(User user) {
+        List<WorkTask> workTasks = new ArrayList<>();
+        try {
+        	PreparedStatement ps = connection.prepareStatement(getUserWorkTasks);
+            ps.setLong(1, user.getId());
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                WorkTask workTask = new WorkTask();
+                workTask.setId(rs.getLong("id"));
+
+                workTask.setTaskUser(user);
+
+                workTask.setCaption(rs.getString("caption"));
+                workTask.setTaskContext(rs.getString("taskcontext"));
+                workTask.setTaskDate(rs.getDate("taskdate"));
+                workTask.setDeadLine(rs.getDate("deadline"));
+                workTasks.add(workTask);
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return workTasks;
+    }
 }
