@@ -32,5 +32,9 @@
         <servlet-name>WorkTaskController</servlet-name>
         <url-pattern>/WorkTaskController</url-pattern>
     </servlet-mapping>
+    
+    <listener>
+    	<listener-class>com.java.servlets.listener.AppContextListener</listener-class>
+  	</listener>
          
 </web-app>

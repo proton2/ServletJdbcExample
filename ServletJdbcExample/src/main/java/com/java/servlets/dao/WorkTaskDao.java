@@ -80,7 +80,9 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
                 workTask.setId(rs.getLong("id"));
 
                 //User user = new User(rs.getLong("taskuser_id"));
-                User user = DaoFactory.getUserDao().getById(rs.getLong("taskuser_id"));
+                //User user = DaoFactory.getUserDao().getById(rs.getLong("taskuser_id"));
+                User user = (User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class);
+                
                 workTask.setTaskUser(user);
 
                 workTask.setCaption(rs.getString("caption"));
@@ -107,7 +109,7 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
             if (rs.next()){
                 wt.setId(rs.getLong("id"));
                 //User user = new User(rs.getLong("taskuser_id"));
-                User user = DaoFactory.getUserDao().getById(rs.getLong("taskuser_id"));
+                User user = (User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class);
                 wt.setTaskUser(user);
                 wt.setCaption(rs.getString("caption"));
                 wt.setTaskContext(rs.getString("taskcontext"));

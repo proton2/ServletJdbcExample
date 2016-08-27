@@ -40,4 +40,14 @@ public class DbUtil {
 			return connection;
 		}
 	}
+	
+	public static void closeConnection() {
+		try {
+			if (connection != null){
+				connection.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -33,30 +33,30 @@ public class WorkTaskController extends HttpServlet {
 
         if (action.equalsIgnoreCase("delete")){
             Long userId = Long.parseLong(request.getParameter("id"));
-            DaoFactory.getWorkTaskDao().delete(userId);
+            DaoFactory.delete(userId, WorkTask.class);
             forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getWorkTaskDao().getAll());
+            request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class));
         }
         else if (action.equalsIgnoreCase("edit")){
             forward = INSERT_OR_EDIT;
             Long workTaskId = Long.parseLong(request.getParameter("id"));
-            WorkTask workTask = DaoFactory.getWorkTaskDao().getById(workTaskId);
+            WorkTask workTask = (WorkTask) DaoFactory.getById(workTaskId, WorkTask.class);
             request.setAttribute("taskuser", workTask.getTaskUser());
             request.setAttribute("workTask", workTask);
         }
         else if (action.equalsIgnoreCase("select_user_list")) {
-            request.setAttribute("users", DaoFactory.getUserDao().getAll());
+            request.setAttribute("users", DaoFactory.getAll(User.class));
             forward = SELECT_USER;
         }
         else if (action.equalsIgnoreCase("select_user")){
             Long userId = Long.parseLong(request.getParameter("id"));
-            User user = DaoFactory.getUserDao().getById(userId);
+            User user = (User) DaoFactory.getById(userId, User.class);
             request.setAttribute("taskuser", user);
             forward = INSERT_OR_EDIT;
         }
         else if (action.equalsIgnoreCase("list")){
             forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getWorkTaskDao().getAll());
+            request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class));
         } else {
             forward = INSERT_OR_EDIT;
         }
@@ -71,7 +71,7 @@ public class WorkTaskController extends HttpServlet {
         String wtId = request.getParameter("id");
 
         Long userId = Long.parseLong(request.getParameter("taskuser_id"));
-        User user = DaoFactory.getUserDao().getById(userId);
+        User user = (User) DaoFactory.getById(userId, User.class);
         wt.setTaskUser(user);
 
         wt.setCaption(request.getParameter("caption"));
@@ -92,16 +92,16 @@ public class WorkTaskController extends HttpServlet {
         }
 
         if (wtId == null || wtId.isEmpty()){
-            DaoFactory.getWorkTaskDao().insert(wt);
+            DaoFactory.insert(wt, WorkTask.class);
         }
         else
         {
             wt.setId(Long.parseLong(wtId));
-            DaoFactory.getWorkTaskDao().update(wt);
+            DaoFactory.update(wt, WorkTask.class);
         }
 
         RequestDispatcher view = request.getRequestDispatcher(LIST_ITEMS);
-        request.setAttribute("workTasks", DaoFactory.getWorkTaskDao().getAll());
+        request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class));
         view.forward(request, response);
     }
 }

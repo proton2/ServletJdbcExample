@@ -25,19 +25,19 @@ public class UserController extends HttpServlet{
     		
     	if (action.equalsIgnoreCase("delete")){
     		Long userId = Long.parseLong(request.getParameter("id"));
-    		DaoFactory.getUserDao().delete(userId);
+    		DaoFactory.delete(userId, User.class);
     		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getUserDao().getAll());
+    		request.setAttribute("users", DaoFactory.getAll(User.class));
     	}
     	else if (action.equalsIgnoreCase("edit")){
     		forward = INSERT_OR_EDIT;
     		Long userId = Long.parseLong(request.getParameter("id"));
-    		User user = DaoFactory.getUserDao().getById(userId);
+    		User user = (User) DaoFactory.getById(userId, User.class);
     		request.setAttribute("user", user);
     	}
 		else if (action.equalsIgnoreCase("list")){
     		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getUserDao().getAll());
+    		request.setAttribute("users", DaoFactory.getAll(User.class));
     	} else {
     		forward = INSERT_OR_EDIT;
     	}
@@ -47,23 +47,23 @@ public class UserController extends HttpServlet{
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	User user = new User();
-    	user.setFirstName(request.getParameter("firstname"));
-    	user.setLastName(request.getParameter("lastname"));
-    	user.setCaption(request.getParameter("caption"));
-    	user.setEmail(request.getParameter("email"));
+    	User user1 = new User();
+    	user1.setFirstName(request.getParameter("firstname"));
+    	user1.setLastName(request.getParameter("lastname"));
+    	user1.setCaption(request.getParameter("caption"));
+    	user1.setEmail(request.getParameter("email"));
     	String userid = request.getParameter("id");
 
     	if (userid == null || userid.isEmpty()){
-			DaoFactory.getUserDao().insert(user);
+			DaoFactory.insert(user1, User.class);
     	}
     	else
     	{
-    		user.setId(Long.parseLong(userid));
-			DaoFactory.getUserDao().update(user);
+    		user1.setId(Long.parseLong(userid));
+			DaoFactory.update(user1, User.class);
     	}
     	RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
-    	request.setAttribute("users", DaoFactory.getUserDao().getAll());
+    	request.setAttribute("users", DaoFactory.getAll(User.class));
     	view.forward(request, response);
     }
 }
