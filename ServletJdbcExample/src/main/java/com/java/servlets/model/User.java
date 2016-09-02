@@ -3,6 +3,7 @@ package com.java.servlets.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Collection;
 
 @Entity
 @Table(name="usertable")
@@ -15,6 +16,8 @@ public class User extends Model{
 	private String caption;
 	@Column(name="email")
 	private String email;
+
+    private Collection<WorkTask> userTasks;
 
     public User() {
     }
@@ -54,6 +57,14 @@ public class User extends Model{
 	public void setCaption(String caption) {
 		this.caption = caption;
 	}
+
+    public Collection<WorkTask> getUserTasks() {
+        return userTasks;
+    }
+
+    public void setUserTasks(Collection<WorkTask> userTasks) {
+        this.userTasks = userTasks;
+    }
 
     @Override
     public String toString() {

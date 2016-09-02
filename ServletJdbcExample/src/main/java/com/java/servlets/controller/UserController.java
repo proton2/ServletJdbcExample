@@ -33,7 +33,7 @@ public class UserController extends HttpServlet{
     		forward = INSERT_OR_EDIT;
     		Long userId = Long.parseLong(request.getParameter("id"));
     		User user = (User) DaoFactory.getById(userId, User.class);
-    		request.setAttribute("user", user);
+			request.setAttribute("user", user);
     	}
 		else if (action.equalsIgnoreCase("list")){
     		forward = LIST_USER;
@@ -55,12 +55,12 @@ public class UserController extends HttpServlet{
     	String userid = request.getParameter("id");
 
     	if (userid == null || userid.isEmpty()){
-			DaoFactory.insert(user1, User.class);
+			DaoFactory.insert(user1);
     	}
     	else
     	{
     		user1.setId(Long.parseLong(userid));
-			DaoFactory.update(user1, User.class);
+			DaoFactory.update(user1);
     	}
     	RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
     	request.setAttribute("users", DaoFactory.getAll(User.class));

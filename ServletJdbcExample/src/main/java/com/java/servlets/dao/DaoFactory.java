@@ -1,12 +1,12 @@
 package com.java.servlets.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by proton2 on 13.08.2016.
@@ -40,11 +40,17 @@ public class DaoFactory {
     	getDao(dtoClass).delete(id);
     }
     
-    public static void insert(Model item, Class <? extends Model> dtoClass){
-    	getDao(dtoClass).insert(item);
+    public static void insert(Model item){
+    	getDao(item.getClass()).insert(item);
     }
     
-    public static void update(Model item, Class <? extends Model> dtoClass){
-    	getDao(dtoClass).update(item);
+    public static <T extends Model> void  update(T item){
+    	getDao(item.getClass()).update(item);
     }
+/*
+    public static List<WorkTask> getUserWorkTasks(User user){
+        UserDao userDao = (UserDao) creators.get(User.class);
+        return userDao.getUserWorkTasks(user);
+    }
+    */
 }

@@ -49,6 +49,32 @@
 	</table>
 	</form>
 
+	<br>
+    User tasks:
+    <table border=1>
+    		<thead>
+    			<tr>
+    				<th>Id </th>
+    				<th>Caption </th>
+    				<th>Task Date </th>
+    				<th>Dead Line </th>
+    				<th colspan=2>Action</th>
+    			</tr>
+    		</thead>
+    		<tbody>
+    			<c:forEach items="${user.userTasks}" var = "workTask">
+    				<tr>
+    					<td><c:out value="${workTask.id}"/></td>
+    					<td><c:out value="${workTask.caption}"/></td>
+    					<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.taskDate}" /></td>
+    					<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.deadLine}" /></td>
+    					<td><a href = "WorkTaskController?action=edit&id=<c:out value = "${workTask.id}"/>">Update</a></td>
+    					<td><a href = "WorkTaskController?action=delete&id=<c:out value = "${workTask.id}"/>">Delete</a></td>
+    				</tr>
+    			</c:forEach>
+    		</tbody>
+    	</table>
+
 	<p><a href = "UserController?action=list">Return to list users</a></p>
 	<button type="button" name="back" onclick="history.back()">back</button>
 </body>

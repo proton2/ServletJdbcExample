@@ -92,12 +92,12 @@ public class WorkTaskController extends HttpServlet {
         }
 
         if (wtId == null || wtId.isEmpty()){
-            DaoFactory.insert(wt, WorkTask.class);
+            DaoFactory.insert(wt);
         }
         else
         {
             wt.setId(Long.parseLong(wtId));
-            DaoFactory.update(wt, WorkTask.class);
+            DaoFactory.update(wt);
         }
 
         RequestDispatcher view = request.getRequestDispatcher(LIST_ITEMS);

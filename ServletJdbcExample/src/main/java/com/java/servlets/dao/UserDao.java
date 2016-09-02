@@ -79,6 +79,9 @@ public class UserDao implements ModelDao<User>{
 				user.setLastName(rs.getString("lastname"));
 				user.setCaption(rs.getString("caption"));
 				user.setEmail(rs.getString("email"));
+
+				user.setUserTasks(getUserWorkTasks(user));
+
 				users.add(user);
 			}
 		}catch (SQLException e) {
@@ -102,6 +105,8 @@ public class UserDao implements ModelDao<User>{
 				user.setLastName(rs.getString("lastname"));
 				user.setCaption(rs.getString("caption"));
 				user.setEmail(rs.getString("email"));
+
+				user.setUserTasks(getUserWorkTasks(user));
 			}
 		} catch (SQLException e) {
             e.printStackTrace();
