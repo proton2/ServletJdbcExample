@@ -10,6 +10,8 @@
 </head>
 
 <body>
+<jsp:include page="master.jsp"></jsp:include>
+<br>
 	<table border=1>
 		<thead>
 			<tr>
@@ -36,6 +38,5 @@
 		</tbody>
 	</table>
 	<p><a href = "UserController?action=">Add user</a></p>
-    <p><a href = "WorkTaskController?action=list">WorkTask list</a></p>
 </body>
 </html>

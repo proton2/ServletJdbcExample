@@ -15,6 +15,8 @@
 </head>
 
 <body>
+<jsp:include page="master.jsp"></jsp:include>
+<br>
 
     <script>
         $(function() {

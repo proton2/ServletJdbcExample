@@ -10,6 +10,8 @@
 </head>
 
 <body>
+<jsp:include page="master.jsp"></jsp:include>
+<br>
 	<table border=1>
 		<thead>
 			<tr>

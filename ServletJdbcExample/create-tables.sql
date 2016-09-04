@@ -1,3 +1,5 @@
+--CREATE DATABASE servletjdbc WITH OWNER = postgres ENCODING = 'UTF8' TABLESPACE = pg_default LC_COLLATE = 'Russian_Russia.1251' LC_CTYPE = 'Russian_Russia.1251' CONNECTION LIMIT = -1;
+
 CREATE SEQUENCE if not exists public.hibernate_sequence
   INCREMENT 1
   MINVALUE 1
@@ -7,7 +9,7 @@ CREATE SEQUENCE if not exists public.hibernate_sequence
 ALTER TABLE public.hibernate_sequence
   OWNER TO postgres;
 
-drop table if exists usertable;
+--drop table if exists usertable;
 create table if not exists public.usertable (
 	id bigint not null default nextval('hibernate_sequence'::regclass),
 	caption varchar(255),
@@ -29,3 +31,32 @@ create table if not exists public.worktask(
       REFERENCES public.usertable (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+insert into public.usertable (caption, firstname, lastname, email) values ('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru');
+insert into public.usertable (caption, firstname, lastname, email) values ('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru');
+
+insert into public.worktask (caption, taskdate, deadline, taskcontext, taskuser_id) values 
+('Test task', '04.09.2016', '05.09.2016', 'test current build', (select id from usertable where usertable.email='test2@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext, taskuser_id) values 
+('Test stend', '02.09.2016', '04.09.2016', 'Create test stend', (select id from usertable where usertable.email='admin-gr@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id) values 
+('Plan description', '31.08.2016', '06.09.2016', 'Make technical description', (select id from usertable where usertable.email='lead@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id) values 
+('Product details', '05.09.2016', '08.09.2016', 'Make technical description', (select id from usertable where usertable.email='vpt@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id) values 
+('report mechanism', '01.09.2016', '03.09.2016', 'Create report engine', (select id from usertable where usertable.email='gr-2@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id) values 
+('log report', '05.09.2016', '06.09.2016', 'Create log report class', (select id from usertable where usertable.email='gr-3@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id) values 
+('attach loading', '04.09.2016', '07.09.2016', 'Create attach loading class', (select id from usertable where usertable.email='gr-1@mycomp.ru'));
+insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id) values 
+('Regress test', '06.09.2016', '07.09.2016', 'perform regress test', (select id from usertable where usertable.email='test1@mycomp.ru'));

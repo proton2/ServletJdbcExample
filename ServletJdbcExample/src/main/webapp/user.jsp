@@ -11,6 +11,8 @@
 </head>
 
 <body>
+<jsp:include page="master.jsp"></jsp:include>
+<br>
 	<form method="POST" action="UserController" name="frmAddUser">
 	<table border=0>
 	<tr>
