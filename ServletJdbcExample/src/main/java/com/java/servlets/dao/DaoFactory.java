@@ -28,12 +28,12 @@ public class DaoFactory {
         return creator;
     }
     
-    public static Model getById(Long id, Class <? extends Model> dtoClass){
-    	return getDao(dtoClass).getById(id);
+    public static Model getById(Long id, Class <? extends Model> dtoClass, String... joinFields){
+    	return getDao(dtoClass).getById(id, joinFields);
     }
     
-    public static List<? extends Model> getAll(Class <? extends Model> dtoClass){
-    	return getDao(dtoClass).getAll();
+    public static List<? extends Model> getAll(Class <? extends Model> dtoClass, String... params){
+    	return getDao(dtoClass).getAll(params);
     }
     
     public static void delete(Long id, Class <? extends Model> dtoClass){

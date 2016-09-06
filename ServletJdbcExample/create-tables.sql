@@ -1,6 +1,6 @@
 --CREATE DATABASE servletjdbc WITH OWNER = postgres ENCODING = 'UTF8' TABLESPACE = pg_default LC_COLLATE = 'Russian_Russia.1251' LC_CTYPE = 'Russian_Russia.1251' CONNECTION LIMIT = -1;
 
-CREATE SEQUENCE if not exists public.hibernate_sequence
+CREATE SEQUENCE public.hibernate_sequence
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
@@ -9,7 +9,6 @@ CREATE SEQUENCE if not exists public.hibernate_sequence
 ALTER TABLE public.hibernate_sequence
   OWNER TO postgres;
 
---drop table if exists usertable;
 create table if not exists public.usertable (
 	id bigint not null default nextval('hibernate_sequence'::regclass),
 	caption varchar(255),

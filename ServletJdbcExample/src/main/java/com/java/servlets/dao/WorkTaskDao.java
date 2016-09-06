@@ -70,20 +70,29 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
     }
 
     @Override
-    public List<WorkTask> getAll() {
+    public List<WorkTask> getAll(String... joinFields) {
         List<WorkTask> workTasks = new ArrayList<>();
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(getAllSql);
+            
+            Boolean lazy = true;
+        	for (String field : joinFields){
+        		if (field.equalsIgnoreCase("user")){
+        			lazy = false;
+        		}
+        	}
+        	
             while(rs.next()){
                 WorkTask workTask = new WorkTask();
                 workTask.setId(rs.getLong("id"));
 
-                //User user = new User(rs.getLong("taskuser_id"));
-                //User user = DaoFactory.getUserDao().getById(rs.getLong("taskuser_id"));
-                User user = (User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class);
-                
-                workTask.setTaskUser(user);
+                if (lazy){
+                	workTask.setTaskUser(new User(rs.getLong("taskuser_id")));
+                }
+                else{
+                	workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                }
 
                 workTask.setCaption(rs.getString("caption"));
                 workTask.setTaskContext(rs.getString("taskcontext"));
@@ -99,7 +108,7 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
     }
 
     @Override
-    public WorkTask getById(Long itemId) {
+    public WorkTask getById(Long itemId, String... joinFields) {
         WorkTask wt = new WorkTask();
         try{
             PreparedStatement ps = connection.prepareStatement(getByIdSql);
@@ -108,9 +117,21 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
 
             if (rs.next()){
                 wt.setId(rs.getLong("id"));
-                //User user = new User(rs.getLong("taskuser_id"));
-                User user = (User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class);
-                wt.setTaskUser(user);
+                
+                Boolean lazy = true;
+            	for (String field : joinFields){
+            		if (field.equalsIgnoreCase("user")){
+            			lazy = false;
+            		}
+            	}
+                
+                if (lazy){
+                	wt.setTaskUser(new User(rs.getLong("taskuser_id")));
+                }
+                else{
+                	wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                }
+                
                 wt.setCaption(rs.getString("caption"));
                 wt.setTaskContext(rs.getString("taskcontext"));
                 wt.setTaskDate(rs.getDate("taskdate"));

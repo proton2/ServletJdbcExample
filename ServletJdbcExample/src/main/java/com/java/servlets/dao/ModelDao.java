@@ -12,6 +12,7 @@ public interface ModelDao <T extends Model>{
     void update(T item);
 
     void delete(Long id);
-    List<T> getAll();
-    T getById(Long itemId);
+    
+    List<T> getAll(String... joinFields);
+    T getById(Long itemId, String... joinFields);
 }

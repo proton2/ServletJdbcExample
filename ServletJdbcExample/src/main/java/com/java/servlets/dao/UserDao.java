@@ -16,6 +16,7 @@ public class UserDao implements ModelDao<User>{
 	private String getUserSql = "select * from usertable where id = ?";
 	
 	private String getUserWorkTasks = "select * from WorkTask where taskuser_id = ?";
+	private String getUserWorkTasksId = "select id from WorkTask where taskuser_id = ?";
 	
 	private Connection connection;
 	
@@ -67,7 +68,7 @@ public class UserDao implements ModelDao<User>{
 	}
 
 	@Override
-	public List<User> getAll(){
+	public List<User> getAll(String... joinFields){
 		List<User> users = new ArrayList<>();
 		try {
 			Statement st = connection.createStatement();
@@ -75,12 +76,13 @@ public class UserDao implements ModelDao<User>{
 			while(rs.next()){
 				User user = new User();
 				user.setId(rs.getLong("id"));
+				
+				user.setUserTasks(getUserWorkTasks(user, joinFields));
+				
 				user.setFirstName(rs.getString("firstname"));
 				user.setLastName(rs.getString("lastname"));
 				user.setCaption(rs.getString("caption"));
 				user.setEmail(rs.getString("email"));
-
-				user.setUserTasks(getUserWorkTasks(user));
 
 				users.add(user);
 			}
@@ -92,7 +94,7 @@ public class UserDao implements ModelDao<User>{
 	}
 
 	@Override
-	public User getById(Long userId){
+	public User getById(Long userId, String... joinFields){
 		User user = new User();
 		try{
 			PreparedStatement ps = connection.prepareStatement(getUserSql);
@@ -106,7 +108,7 @@ public class UserDao implements ModelDao<User>{
 				user.setCaption(rs.getString("caption"));
 				user.setEmail(rs.getString("email"));
 
-				user.setUserTasks(getUserWorkTasks(user));
+				user.setUserTasks(getUserWorkTasks(user, joinFields));
 			}
 		} catch (SQLException e) {
             e.printStackTrace();
@@ -114,10 +116,18 @@ public class UserDao implements ModelDao<User>{
 		return user;
 	}
 	
-    public List<WorkTask> getUserWorkTasks(User user) {
-        List<WorkTask> workTasks = new ArrayList<>();
+    public List<WorkTask> getUserWorkTasks(User user, String... joinFields) {
+        
+    	List<WorkTask> workTasks = new ArrayList<>();
         try {
-        	PreparedStatement ps = connection.prepareStatement(getUserWorkTasks);
+        	Boolean lazy = true;
+        	for (String field : joinFields){
+        		if (field.equalsIgnoreCase("worktask")){
+        			lazy = false;
+        		}
+        	}
+        	
+        	PreparedStatement ps = connection.prepareStatement(lazy ? getUserWorkTasksId : getUserWorkTasks);
             ps.setLong(1, user.getId());
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -125,12 +135,14 @@ public class UserDao implements ModelDao<User>{
                 workTask.setId(rs.getLong("id"));
 
                 workTask.setTaskUser(user);
-
-                workTask.setCaption(rs.getString("caption"));
-                workTask.setTaskContext(rs.getString("taskcontext"));
-                workTask.setTaskDate(rs.getDate("taskdate"));
-                workTask.setDeadLine(rs.getDate("deadline"));
+                if (!lazy){
+                	workTask.setCaption(rs.getString("caption"));
+                	workTask.setTaskContext(rs.getString("taskcontext"));
+                	workTask.setTaskDate(rs.getDate("taskdate"));
+                	workTask.setDeadLine(rs.getDate("deadline"));
+                }
                 workTasks.add(workTask);
+                
             }
         }catch (SQLException e) {
             e.printStackTrace();
