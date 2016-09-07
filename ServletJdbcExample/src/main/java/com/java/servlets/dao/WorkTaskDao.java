@@ -6,6 +6,7 @@ import com.java.servlets.util.DbUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,28 +71,23 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
     }
 
     @Override
-    public List<WorkTask> getAll(String... joinFields) {
+    public List<WorkTask> getAll(String... fields) {
         List<WorkTask> workTasks = new ArrayList<>();
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(getAllSql);
-            
-            Boolean lazy = true;
-        	for (String field : joinFields){
-        		if (field.equalsIgnoreCase("user")){
-        			lazy = false;
-        		}
-        	}
-        	
+
+            Boolean eagerLoading = Arrays.stream(fields).filter(e->e.equals("user")).findAny().isPresent();
+
             while(rs.next()){
                 WorkTask workTask = new WorkTask();
                 workTask.setId(rs.getLong("id"));
-
-                if (lazy){
-                	workTask.setTaskUser(new User(rs.getLong("taskuser_id")));
+                
+                if (eagerLoading){
+                	workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
                 }
                 else{
-                	workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                	workTask.setTaskUser(new User(rs.getLong("taskuser_id")));
                 }
 
                 workTask.setCaption(rs.getString("caption"));
@@ -117,19 +113,13 @@ public class WorkTaskDao implements ModelDao<WorkTask>{
 
             if (rs.next()){
                 wt.setId(rs.getLong("id"));
-                
-                Boolean lazy = true;
-            	for (String field : joinFields){
-            		if (field.equalsIgnoreCase("user")){
-            			lazy = false;
-            		}
-            	}
-                
-                if (lazy){
-                	wt.setTaskUser(new User(rs.getLong("taskuser_id")));
+
+                Boolean eagerLoading = Arrays.stream(joinFields).filter(e->e.equals("user")).findAny().isPresent();
+                if (eagerLoading){
+                    wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
                 }
                 else{
-                	wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                    wt.setTaskUser(new User(rs.getLong("taskuser_id")));
                 }
                 
                 wt.setCaption(rs.getString("caption"));

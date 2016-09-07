@@ -6,6 +6,7 @@ import com.java.servlets.util.DbUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class UserDao implements ModelDao<User>{
@@ -17,7 +18,7 @@ public class UserDao implements ModelDao<User>{
 	
 	private String getUserWorkTasks = "select * from WorkTask where taskuser_id = ?";
 	private String getUserWorkTasksId = "select id from WorkTask where taskuser_id = ?";
-	
+
 	private Connection connection;
 	
 	public UserDao() {
@@ -68,16 +69,17 @@ public class UserDao implements ModelDao<User>{
 	}
 
 	@Override
-	public List<User> getAll(String... joinFields){
+	public List<User> getAll(String... fields){
 		List<User> users = new ArrayList<>();
 		try {
 			Statement st = connection.createStatement();
 			ResultSet rs = st.executeQuery(getAllSql);
+			Boolean eagerLoading = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
 			while(rs.next()){
 				User user = new User();
 				user.setId(rs.getLong("id"));
 				
-				user.setUserTasks(getUserWorkTasks(user, joinFields));
+				user.setUserTasks(getUserWorkTasks(user, eagerLoading));
 				
 				user.setFirstName(rs.getString("firstname"));
 				user.setLastName(rs.getString("lastname"));
@@ -94,12 +96,13 @@ public class UserDao implements ModelDao<User>{
 	}
 
 	@Override
-	public User getById(Long userId, String... joinFields){
+	public User getById(Long userId, String... fields){
 		User user = new User();
 		try{
 			PreparedStatement ps = connection.prepareStatement(getUserSql);
 			ps.setLong(1, userId);
 			ResultSet rs = ps.executeQuery();
+			Boolean eagerLoading = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
 			
 			if (rs.next()){
 				user.setId(rs.getLong("id"));
@@ -108,7 +111,7 @@ public class UserDao implements ModelDao<User>{
 				user.setCaption(rs.getString("caption"));
 				user.setEmail(rs.getString("email"));
 
-				user.setUserTasks(getUserWorkTasks(user, joinFields));
+				user.setUserTasks(getUserWorkTasks(user, eagerLoading));
 			}
 		} catch (SQLException e) {
             e.printStackTrace();
@@ -116,27 +119,19 @@ public class UserDao implements ModelDao<User>{
 		return user;
 	}
 	
-    public List<WorkTask> getUserWorkTasks(User user, String... joinFields) {
+    public List<WorkTask> getUserWorkTasks(User user, Boolean eagerLoading) {
         
     	List<WorkTask> workTasks = new ArrayList<>();
         try {
-        	Boolean lazy = true;
-        	for (String field : joinFields){
-        		if (field.equalsIgnoreCase("worktask")){
-        			lazy = false;
-        		}
-        	}
-        	
-        	PreparedStatement ps = connection.prepareStatement(lazy ? getUserWorkTasksId : getUserWorkTasks);
+        	PreparedStatement ps = connection.prepareStatement(eagerLoading ? getUserWorkTasks : getUserWorkTasksId );
             ps.setLong(1, user.getId());
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 WorkTask workTask = new WorkTask();
                 workTask.setId(rs.getLong("id"));
-
-                workTask.setTaskUser(user);
-                if (!lazy){
-                	workTask.setCaption(rs.getString("caption"));
+                if (eagerLoading){
+					workTask.setTaskUser(user);
+					workTask.setCaption(rs.getString("caption"));
                 	workTask.setTaskContext(rs.getString("taskcontext"));
                 	workTask.setTaskDate(rs.getDate("taskdate"));
                 	workTask.setDeadLine(rs.getDate("deadline"));

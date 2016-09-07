@@ -33,7 +33,7 @@ public class DaoFactory {
     }
     
     public static List<? extends Model> getAll(Class <? extends Model> dtoClass, String... params){
-    	return getDao(dtoClass).getAll(params);
+        return getDao(dtoClass).getAll(params);
     }
     
     public static void delete(Long id, Class <? extends Model> dtoClass){
