@@ -101,7 +101,7 @@ public class WorkTaskController extends HttpServlet {
         }
 
         RequestDispatcher view = request.getRequestDispatcher(LIST_ITEMS);
-        request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class));
+        request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class, "user"));
         view.forward(request, response);
     }
 }
