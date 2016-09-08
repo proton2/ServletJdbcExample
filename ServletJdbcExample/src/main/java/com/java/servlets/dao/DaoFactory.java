@@ -14,7 +14,7 @@ import java.util.Map;
 public class DaoFactory {
     private static Map<Class<? extends Model>, ModelDao<?>> creators = null;
     
-    private static <T extends ModelDao> T getDao(Class<? extends Model> dtoClass) {
+    public static <T extends ModelDao> T getDao(Class<? extends Model> dtoClass) {
     	if (creators == null){
     		creators = new HashMap<>();
         	creators.put(User.class, new UserDao());
@@ -29,11 +29,15 @@ public class DaoFactory {
     }
     
     public static Model getById(Long id, Class <? extends Model> dtoClass, String... joinFields){
-    	return getDao(dtoClass).getById(id, joinFields);
+    	return getDao(dtoClass).getById(id, true, joinFields);
     }
     
     public static List<? extends Model> getAll(Class <? extends Model> dtoClass, String... params){
-        return getDao(dtoClass).getAll(params);
+        return getDao(dtoClass).getAll(true, params);
+    }
+
+    public static List<? extends Model> getListById(Long id, Class <? extends Model> dtoClass, boolean eager, String... fields){
+        return getDao(dtoClass).getListById(id, eager, fields);
     }
     
     public static void delete(Long id, Class <? extends Model> dtoClass){
@@ -47,10 +51,4 @@ public class DaoFactory {
     public static <T extends Model> void  update(T item){
     	getDao(item.getClass()).update(item);
     }
-/*
-    public static List<WorkTask> getUserWorkTasks(User user){
-        UserDao userDao = (UserDao) creators.get(User.class);
-        return userDao.getUserWorkTasks(user);
-    }
-    */
 }

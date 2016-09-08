@@ -13,6 +13,7 @@ public interface ModelDao <T extends Model>{
 
     void delete(Long id);
     
-    List<T> getAll(String... joinFields);
-    T getById(Long itemId, String... joinFields);
+    List<T> getAll(boolean eager, String... joinFields);
+    List<T> getListById(Long itemId, boolean eager, String... fields);
+    T getById(Long itemId, boolean eager, String... joinFields);
 }
