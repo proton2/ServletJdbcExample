@@ -76,16 +76,15 @@ public class UserDao implements ModelDao<User>{
 			while(rs.next()){
 				User user = new User();
 				user.setId(rs.getLong("id"));
-				
-				user.setUserTasks(
-						(Collection<WorkTask>) DaoFactory.getListById(user.getId(), WorkTask.class, eagerWorktask)
-				);
-				
-				user.setFirstName(rs.getString("firstname"));
-				user.setLastName(rs.getString("lastname"));
-				user.setCaption(rs.getString("caption"));
-				user.setEmail(rs.getString("email"));
-
+				if(eager) {
+					user.setFirstName(rs.getString("firstname"));
+					user.setLastName(rs.getString("lastname"));
+					user.setCaption(rs.getString("caption"));
+					user.setEmail(rs.getString("email"));
+					user.setUserTasks(
+							(Collection<WorkTask>) DaoFactory.getListById(user.getId(), WorkTask.class, eagerWorktask)
+					);
+				}
 				users.add(user);
 			}
 		}catch (SQLException e) {

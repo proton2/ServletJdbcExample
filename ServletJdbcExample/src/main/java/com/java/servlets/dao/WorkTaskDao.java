@@ -78,22 +78,22 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(getAllSql);
 
-            Boolean eagerLoading = Arrays.stream(fields).filter(e -> e.equals("user")).findAny().isPresent();
+            Boolean eagerUser = Arrays.stream(fields).filter(e -> e.equals("user")).findAny().isPresent();
 
             while (rs.next()) {
                 WorkTask workTask = new WorkTask();
                 workTask.setId(rs.getLong("id"));
-
-                if (eagerLoading) {
-                    workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
-                } else {
-                    workTask.setTaskUser(new User(rs.getLong("taskuser_id")));
+                if (eager) {
+                    workTask.setCaption(rs.getString("caption"));
+                    workTask.setTaskContext(rs.getString("taskcontext"));
+                    workTask.setTaskDate(rs.getDate("taskdate"));
+                    workTask.setDeadLine(rs.getDate("deadline"));
+                    if (eagerUser) {
+                        workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                    } else {
+                        workTask.setTaskUser(new User(rs.getLong("taskuser_id")));
+                    }
                 }
-
-                workTask.setCaption(rs.getString("caption"));
-                workTask.setTaskContext(rs.getString("taskcontext"));
-                workTask.setTaskDate(rs.getDate("taskdate"));
-                workTask.setDeadLine(rs.getDate("deadline"));
                 workTasks.add(workTask);
             }
         } catch (SQLException e) {
