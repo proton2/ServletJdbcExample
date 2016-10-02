@@ -40,7 +40,7 @@ public class WorkTaskController extends HttpServlet {
         else if (action.equalsIgnoreCase("edit")){
             forward = INSERT_OR_EDIT;
             Long workTaskId = Long.parseLong(request.getParameter("id"));
-            WorkTask workTask = (WorkTask) DaoFactory.getById(workTaskId, WorkTask.class, "user");
+            WorkTask workTask = (WorkTask) DaoFactory.getById(workTaskId, true, WorkTask.class, "user");
             request.setAttribute("taskuser", workTask.getTaskUser());
             request.setAttribute("workTask", workTask);
         }
@@ -50,7 +50,7 @@ public class WorkTaskController extends HttpServlet {
         }
         else if (action.equalsIgnoreCase("select_user")){
             Long userId = Long.parseLong(request.getParameter("id"));
-            User user = (User) DaoFactory.getById(userId, User.class);
+            User user = (User) DaoFactory.getById(userId, true, User.class);
             request.setAttribute("taskuser", user);
             forward = INSERT_OR_EDIT;
         }
@@ -71,7 +71,7 @@ public class WorkTaskController extends HttpServlet {
         String wtId = request.getParameter("id");
 
         Long userId = Long.parseLong(request.getParameter("taskuser_id"));
-        User user = (User) DaoFactory.getById(userId, User.class);
+        User user = (User) DaoFactory.getById(userId, true, User.class);
         wt.setTaskUser(user);
 
         wt.setCaption(request.getParameter("caption"));

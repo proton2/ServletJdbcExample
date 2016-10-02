@@ -24,7 +24,7 @@ public class UserDao implements ModelDao<User>{
     }
 
 	@Override
-	public void insert(User user) {
+	public Long insert(User user) {
 		try{
 			PreparedStatement ps = connection.prepareStatement(insertSql);
 			ps.setString(1, user.getFirstName());
@@ -36,6 +36,19 @@ public class UserDao implements ModelDao<User>{
 		catch (SQLException e) {
             e.printStackTrace();
         }
+
+		Long insertCount = -1l;
+		try {
+			Statement select = connection.createStatement();
+			ResultSet result = select.executeQuery("SELECT max(id) FROM User");
+			while (result.next()) {
+				insertCount = result.getLong(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return insertCount;
 	}
 
 	@Override

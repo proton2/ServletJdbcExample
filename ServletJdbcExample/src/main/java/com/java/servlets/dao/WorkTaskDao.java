@@ -29,7 +29,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
-    public void insert(WorkTask item) {
+    public Long insert(WorkTask item) {
         try {
             PreparedStatement ps = connection.prepareStatement(insertSql);
             ps.setLong(1, item.getTaskUser().getId());
@@ -41,6 +41,19 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        Long insertCount = -1l;
+        try {
+            Statement select = connection.createStatement();
+            ResultSet result = select.executeQuery("SELECT max(id) FROM WorkTask");
+            while (result.next()) {
+                insertCount = result.getLong(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return insertCount;
     }
 
     @Override
@@ -89,7 +102,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     workTask.setTaskDate(rs.getDate("taskdate"));
                     workTask.setDeadLine(rs.getDate("deadline"));
                     if (eagerUser) {
-                        workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                        workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), true, User.class));
                     } else {
                         workTask.setTaskUser(new User(rs.getLong("taskuser_id")));
                     }
@@ -116,7 +129,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                 if (eager) {
                     Boolean eagerUser = Arrays.stream(joinFields).filter(e -> e.equals("user")).findAny().isPresent();
                     if (eagerUser) {
-                        wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), User.class));
+                        wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), true, User.class));
                     } else {
                         wt.setTaskUser(new User(rs.getLong("taskuser_id")));
                     }
@@ -149,11 +162,10 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     workTask.setTaskDate(rs.getDate("taskdate"));
                     workTask.setDeadLine(rs.getDate("deadline"));
                     if(eagerUser) {
-                        workTask.setTaskUser((User) DaoFactory.getById(itemId, User.class));
+                        workTask.setTaskUser((User) DaoFactory.getById(itemId, true, User.class));
                     }
                     else {
-                        //workTask.setTaskUser((User) DaoFactory.getById(itemId, User.class));
-                        workTask.setTaskUser((User) DaoFactory.getDao(User.class).getById(itemId, false));
+                        workTask.setTaskUser((User) DaoFactory.getById(itemId, false, User.class));
                     }
                 }
                 workTasks.add(workTask);
