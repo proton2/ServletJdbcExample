@@ -1,5 +1,6 @@
 package com.java.servlets.dao;
 
+import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
@@ -24,8 +25,9 @@ public class UserDao implements ModelDao<User>{
     }
 
 	@Override
-	public Long insert(User user) {
+	public <V extends Model> Long insert(V item) {
 		try{
+			User user = (User)item;
 			PreparedStatement ps = connection.prepareStatement(insertSql);
 			ps.setString(1, user.getFirstName());
 			ps.setString(2, user.getLastName());
@@ -34,10 +36,10 @@ public class UserDao implements ModelDao<User>{
 			ps.executeUpdate();
 		}
 		catch (SQLException e) {
-            e.printStackTrace();
-        }
+			e.printStackTrace();
+		}
 
-		Long insertCount = -1l;
+		Long insertCount = -1L;
 		try {
 			Statement select = connection.createStatement();
 			ResultSet result = select.executeQuery("SELECT max(id) FROM User");
@@ -52,26 +54,27 @@ public class UserDao implements ModelDao<User>{
 	}
 
 	@Override
-	public void delete(Long userId) {
+	public <V extends Model> void update(V item) {
 		try{
-			PreparedStatement ps = connection.prepareStatement(deleteSql);
-			ps.setLong(1, userId);
-			ps.executeUpdate();
-		}
-		catch (SQLException e) {
-            e.printStackTrace();
-        }
-	}
-
-	@Override
-	public void update(User user) {
-		try{
+			User user = (User)item;
 			PreparedStatement ps = connection.prepareStatement(updateSql);
 			ps.setString(1, user.getFirstName());
 			ps.setString(2, user.getLastName());
 			ps.setString(3, user.getCaption());
 			ps.setString(4, user.getEmail());
 			ps.setLong(5, user.getId());
+			ps.executeUpdate();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void delete(Long userId) {
+		try{
+			PreparedStatement ps = connection.prepareStatement(deleteSql);
+			ps.setLong(1, userId);
 			ps.executeUpdate();
 		}
 		catch (SQLException e) {

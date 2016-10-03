@@ -1,5 +1,6 @@
 package com.java.servlets.dao;
 
+import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
@@ -29,20 +30,21 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
-    public Long insert(WorkTask item) {
+    public <V extends Model> Long insert(V item) {
         try {
+            WorkTask wt = (WorkTask)item;
             PreparedStatement ps = connection.prepareStatement(insertSql);
-            ps.setLong(1, item.getTaskUser().getId());
-            ps.setString(2, item.getCaption());
-            ps.setString(3, item.getTaskContext());
-            ps.setDate(4, new java.sql.Date(item.getTaskDate().getTime()));
-            ps.setDate(5, new java.sql.Date(item.getDeadLine().getTime()));
+            ps.setLong(1, wt.getTaskUser().getId());
+            ps.setString(2, wt.getCaption());
+            ps.setString(3, wt.getTaskContext());
+            ps.setDate(4, new java.sql.Date(wt.getTaskDate().getTime()));
+            ps.setDate(5, new java.sql.Date(wt.getDeadLine().getTime()));
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        Long insertCount = -1l;
+        Long insertCount = -1L;
         try {
             Statement select = connection.createStatement();
             ResultSet result = select.executeQuery("SELECT max(id) FROM WorkTask");
@@ -57,14 +59,15 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
-    public void update(WorkTask item) {
+    public <V extends Model> void update(V item) {
         try {
+            WorkTask wt = (WorkTask)item;
             PreparedStatement ps = connection.prepareStatement(updateSql);
-            ps.setLong(1, item.getTaskUser().getId());
-            ps.setString(2, item.getCaption());
-            ps.setString(3, item.getTaskContext());
-            ps.setDate(4, new java.sql.Date(item.getTaskDate().getTime()));
-            ps.setDate(5, new java.sql.Date(item.getDeadLine().getTime()));
+            ps.setLong(1, wt.getTaskUser().getId());
+            ps.setString(2, wt.getCaption());
+            ps.setString(3, wt.getTaskContext());
+            ps.setDate(4, new java.sql.Date(wt.getTaskDate().getTime()));
+            ps.setDate(5, new java.sql.Date(wt.getDeadLine().getTime()));
             ps.setLong(6, item.getId());
             ps.executeUpdate();
         } catch (SQLException e) {

@@ -8,8 +8,8 @@ import java.util.List;
  * Created by proton2 on 06.08.2016.
  */
 public interface ModelDao <T extends Model>{
-    Long insert(T item);
-    void update(T item);
+    <V extends Model> Long insert(V item);
+    <V extends Model> void update(V item);
 
     void delete(Long id);
     

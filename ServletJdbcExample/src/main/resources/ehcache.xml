@@ -1,11 +1,11 @@
 <?xml version ="1.0" encoding="UTF-8"?>
 <ehcache>
-	<defaultcache maxelementsinmemory="10000" eternal="false" 
-		timetoidleseconds="120" timetoliveseconds="120" overflowtodisk="false"
-		memorystoreevictionpolicy="LRU"  statistics="true" />
-
-	<cache name="newsCache" maxelementsinmemory="20" 
-		eternal="false" overflowtodisk="false" 
-		timetoidleseconds="300" timetoliveseconds="600"
-		memorystoreevictionpolicy="LRU" statistics="true" />
+	<cache name="newsCache"
+		   eternal="false"
+		   statistics="true"
+		   maxEntriesLocalHeap="5000"
+		   overflowToDisk="false"
+		   timeToLiveSeconds="10000"
+		   memoryStoreEvictionPolicy="FIFO"
+	/>
 </ehcache>

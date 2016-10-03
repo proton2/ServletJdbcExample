@@ -17,14 +17,14 @@ import java.util.Map;
 public class DaoFactory {
     private static Map<Class<? extends Model>, ModelDao<?>> creators = null;
     
-    public static <T extends ModelDao> T getDao(Class<? extends Model> dtoClass) {
+    private static ModelDao <?> getDao(Class<? extends Model> dtoClass) {
     	if (creators == null){
     		creators = new HashMap<>();
         	creators.put(User.class, new UserDao());
             creators.put(WorkTask.class, new WorkTaskDao());
     	}
-    	@SuppressWarnings("unchecked")
-		T creator = (T) creators.get(dtoClass);
+
+		ModelDao<?> creator = creators.get(dtoClass);
         if (creator == null) {
             throw new Error("Dao object for " + dtoClass + " not found.");
         }
@@ -35,13 +35,14 @@ public class DaoFactory {
 
         Model model = null;
         Cache cache = EHCacheManger.getCache();
-        Element element = cache.get(new Long(id));
+        Element element = cache.get(id);
         if (element == null){
-            System.out.println("cache miss");
             model = getDao(dtoClass).getById(id, eager, joinFields);
+            System.out.println("db loading " + model.toString());
             cache.put(new Element(id, model));
         } else {
             model = (Model) element.getObjectValue();
+            System.out.println("cache loading " + model.toString());
         }
 
         return model;
@@ -53,10 +54,11 @@ public class DaoFactory {
         getDao(dtoClass).delete(id);
     }
     
-    public static void insert(Model item){
+    public static <T extends Model> void insert(T item){
     	Long itemId = getDao(item.getClass()).insert(item);
         Cache cache = EHCacheManger.getCache();
         cache.put(new Element(itemId, item));
+        System.out.println("cache put " + item.toString());
     }
     
     public static <T extends Model> void  update(T item){
@@ -65,13 +67,14 @@ public class DaoFactory {
 
     	getDao(item.getClass()).update(item);
         cache.put(new Element(item.getId(), item));
+        System.out.println("cache update " + item.toString());
     }
 
     public static List<? extends Model> getAll(Class <? extends Model> dtoClass, String... params){
         return getDao(dtoClass).getAll(true, params);
     }
 
-    public static List<? extends Model> getListById(Long id, Class <? extends Model> dtoClass, boolean eager, String... fields){
+    static List<? extends Model> getListById(Long id, Class <? extends Model> dtoClass, boolean eager, String... fields){
         return getDao(dtoClass).getListById(id, eager, fields);
     }
 }

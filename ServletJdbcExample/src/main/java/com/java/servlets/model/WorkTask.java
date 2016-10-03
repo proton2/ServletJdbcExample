@@ -59,4 +59,9 @@ public class WorkTask extends Model{
     public void setDeadLine(Date deadLine) {
         this.deadLine = deadLine;
     }
+
+    @Override
+    public String toString() {
+        return "WorkTask " + caption;
+    }
 }

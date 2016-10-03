@@ -1,9 +1,9 @@
 package com.java.servlets.listener;
 
+import com.java.servlets.util.DbUtil;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import com.java.servlets.util.DbUtil;
 
 public class AppContextListener implements ServletContextListener{
 
