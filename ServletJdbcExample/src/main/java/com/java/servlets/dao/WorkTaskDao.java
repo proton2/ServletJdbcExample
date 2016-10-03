@@ -30,7 +30,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
-    public <V extends Model> Long insert(V item) {
+    public Long insert(Model item) {
         try {
             WorkTask wt = (WorkTask)item;
             PreparedStatement ps = connection.prepareStatement(insertSql);
@@ -59,7 +59,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
-    public <V extends Model> void update(V item) {
+    public void update(Model item) {
         try {
             WorkTask wt = (WorkTask)item;
             PreparedStatement ps = connection.prepareStatement(updateSql);
@@ -85,7 +85,6 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public List<WorkTask> getAll(boolean eager, String... fields) {

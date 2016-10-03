@@ -54,14 +54,14 @@ public class DaoFactory {
         getDao(dtoClass).delete(id);
     }
     
-    public static <T extends Model> void insert(T item){
+    public static void insert(Model item){
     	Long itemId = getDao(item.getClass()).insert(item);
         Cache cache = EHCacheManger.getCache();
         cache.put(new Element(itemId, item));
         System.out.println("cache put " + item.toString());
     }
     
-    public static <T extends Model> void  update(T item){
+    public static void update(Model item){
         Cache cache = EHCacheManger.getCache();
         cache.remove(item.getId());
 

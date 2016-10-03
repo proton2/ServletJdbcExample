@@ -25,7 +25,7 @@ public class UserDao implements ModelDao<User>{
     }
 
 	@Override
-	public <V extends Model> Long insert(V item) {
+	public Long insert(Model item) {
 		try{
 			User user = (User)item;
 			PreparedStatement ps = connection.prepareStatement(insertSql);
@@ -54,7 +54,7 @@ public class UserDao implements ModelDao<User>{
 	}
 
 	@Override
-	public <V extends Model> void update(V item) {
+	public void update(Model item) {
 		try{
 			User user = (User)item;
 			PreparedStatement ps = connection.prepareStatement(updateSql);
