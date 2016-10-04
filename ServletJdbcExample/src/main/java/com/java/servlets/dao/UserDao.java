@@ -11,16 +11,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class UserDao implements ModelDao<User>{
+class UserDao implements ModelDao<User>{
 	private String insertSql = "insert into usertable(firstname, lastname, caption, email) values (?, ?, ?, ?)";
 	private String deleteSql = "delete from usertable where id = ?";
 	private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=? where id=?";
 	private String getAllSql = "select * from usertable";
+	private String getIdSql = "select id from usertable";
 	private String getUserSql = "select * from usertable where id = ?";
 
 	private Connection connection;
 	
-	public UserDao() {
+	UserDao() {
         connection = DbUtil.getConnection();
     }
 
@@ -87,7 +88,7 @@ public class UserDao implements ModelDao<User>{
 		List<User> users = new ArrayList<>();
 		try {
 			Statement st = connection.createStatement();
-			ResultSet rs = st.executeQuery(getAllSql);
+			ResultSet rs = st.executeQuery(eager ? getAllSql : getIdSql);
 			Boolean eagerWorktask = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
 			while(rs.next()){
 				User user = new User();
@@ -113,27 +114,27 @@ public class UserDao implements ModelDao<User>{
 	@Override
 	public User getById(Long userId, boolean eager, String... fields){
 		User user = new User();
-		try{
-			PreparedStatement ps = connection.prepareStatement(getUserSql);
-			ps.setLong(1, userId);
-			ResultSet rs = ps.executeQuery();
-
-			if (rs.next()){
-				user.setId(rs.getLong("id"));
-				if (eager) {
+		user.setId(userId);
+		if (eager) {
+			try {
+				PreparedStatement ps = connection.prepareStatement(getUserSql);
+				ps.setLong(1, userId);
+				ResultSet rs = ps.executeQuery();
+				if (rs.next()) {
+					user.setId(rs.getLong("id"));
 					user.setFirstName(rs.getString("firstname"));
 					user.setLastName(rs.getString("lastname"));
 					user.setCaption(rs.getString("caption"));
 					user.setEmail(rs.getString("email"));
-					Boolean eagerWorktask = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
+					Boolean eagerWorktask = Arrays.stream(fields).filter(e -> e.equals("worktask")).findAny().isPresent();
 					user.setUserTasks(
 							(Collection<WorkTask>) DaoFactory.getListById(user.getId(), WorkTask.class, eagerWorktask)
 					);
 				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-            e.printStackTrace();
-        }
+		}
 		return user;
 	}
 
