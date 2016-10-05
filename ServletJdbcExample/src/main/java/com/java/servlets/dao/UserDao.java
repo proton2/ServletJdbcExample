@@ -4,6 +4,9 @@ import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.EHCacheManger;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-class UserDao implements ModelDao<User>{
+class UserDao extends AbstractDao implements ModelDao<User>{
 	private String insertSql = "insert into usertable(firstname, lastname, caption, email) values (?, ?, ?, ?)";
 	private String deleteSql = "delete from usertable where id = ?";
 	private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=? where id=?";
@@ -40,22 +43,26 @@ class UserDao implements ModelDao<User>{
 			e.printStackTrace();
 		}
 
-		Long insertCount = -1L;
+		Long insertId = -1L;
 		try {
 			Statement select = connection.createStatement();
 			ResultSet result = select.executeQuery("SELECT max(id) FROM User");
 			while (result.next()) {
-				insertCount = result.getLong(1);
+				insertId = result.getLong(1);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		Cache cache = EHCacheManger.getCache();
+		cache.put(new Element(insertId, item));
 
-		return insertCount;
+		return insertId;
 	}
 
 	@Override
 	public void update(Model item) {
+		Cache cache = EHCacheManger.getCache();
+		cache.remove(item.getId());
 		try{
 			User user = (User)item;
 			PreparedStatement ps = connection.prepareStatement(updateSql);
@@ -69,10 +76,14 @@ class UserDao implements ModelDao<User>{
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		cache.put(new Element(item.getId(), item));
 	}
 
 	@Override
 	public void delete(Long userId) {
+		Cache cache = EHCacheManger.getCache();
+		cache.remove(userId);
+
 		try{
 			PreparedStatement ps = connection.prepareStatement(deleteSql);
 			ps.setLong(1, userId);
@@ -85,11 +96,13 @@ class UserDao implements ModelDao<User>{
 
 	@Override
 	public List<User> getAll(boolean eager, String... fields){
+		Boolean eagerWorktask = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
+		List<Long> listId = getListId(null, getIdSql);
+
 		List<User> users = new ArrayList<>();
 		try {
 			Statement st = connection.createStatement();
 			ResultSet rs = st.executeQuery(eager ? getAllSql : getIdSql);
-			Boolean eagerWorktask = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
 			while(rs.next()){
 				User user = new User();
 				user.setId(rs.getLong("id"));
@@ -113,7 +126,20 @@ class UserDao implements ModelDao<User>{
 
 	@Override
 	public User getById(Long userId, boolean eager, String... fields){
-		User user = new User();
+		User user = null;
+		Boolean eagerWorktask = Arrays.stream(fields).filter(e -> e.equals("worktask")).findAny().isPresent();
+
+		Cache cache = EHCacheManger.getCache();
+		Element element = cache.get(userId);
+		if (element != null){
+			user = (User)element.getObjectValue();
+			user.setUserTasks(
+					(Collection<WorkTask>) DaoFactory.getListById(user.getId(), WorkTask.class, eagerWorktask)
+			);
+			return user;
+		}
+
+		user = new User();
 		user.setId(userId);
 		if (eager) {
 			try {
@@ -126,7 +152,6 @@ class UserDao implements ModelDao<User>{
 					user.setLastName(rs.getString("lastname"));
 					user.setCaption(rs.getString("caption"));
 					user.setEmail(rs.getString("email"));
-					Boolean eagerWorktask = Arrays.stream(fields).filter(e -> e.equals("worktask")).findAny().isPresent();
 					user.setUserTasks(
 							(Collection<WorkTask>) DaoFactory.getListById(user.getId(), WorkTask.class, eagerWorktask)
 					);
@@ -135,6 +160,8 @@ class UserDao implements ModelDao<User>{
 				e.printStackTrace();
 			}
 		}
+
+		cache.put(new Element(userId, user));
 		return user;
 	}
 

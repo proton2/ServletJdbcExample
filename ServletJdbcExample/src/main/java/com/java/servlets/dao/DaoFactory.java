@@ -3,9 +3,6 @@ package com.java.servlets.dao;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
-import com.java.servlets.util.EHCacheManger;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,42 +29,19 @@ public class DaoFactory {
     }
     
     public static Model getById(Long id, boolean eager, Class <? extends Model> dtoClass, String... joinFields){
-
-        Model model = null;
-        Cache cache = EHCacheManger.getCache();
-        Element element = cache.get(id);
-        if (element == null){
-            model = getDao(dtoClass).getById(id, eager, joinFields);
-            System.out.println("db loading " + model.toString());
-            cache.put(new Element(id, model));
-        } else {
-            model = (Model) element.getObjectValue();
-            System.out.println("cache loading " + model.toString());
-        }
-
-        return model;
+        return getDao(dtoClass).getById(id, eager, joinFields);
     }
 
     public static void delete(Long id, Class <? extends Model> dtoClass){
-        Cache cache = EHCacheManger.getCache();
-        cache.remove(id);
         getDao(dtoClass).delete(id);
     }
     
     public static void insert(Model item){
     	Long itemId = getDao(item.getClass()).insert(item);
-        Cache cache = EHCacheManger.getCache();
-        cache.put(new Element(itemId, item));
-        System.out.println("cache put " + item.toString());
     }
     
     public static void update(Model item){
-        Cache cache = EHCacheManger.getCache();
-        cache.remove(item.getId());
-
     	getDao(item.getClass()).update(item);
-        cache.put(new Element(item.getId(), item));
-        System.out.println("cache update " + item.toString());
     }
 
     public static List<? extends Model> getAll(Class <? extends Model> dtoClass, String... params){
