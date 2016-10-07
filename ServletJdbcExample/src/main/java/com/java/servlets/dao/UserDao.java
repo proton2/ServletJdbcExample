@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-class UserDao extends AbstractDao implements ModelDao<User>{
+class UserDao implements ModelDao<User>{
 	private String insertSql = "insert into usertable(firstname, lastname, caption, email) values (?, ?, ?, ?)";
 	private String deleteSql = "delete from usertable where id = ?";
 	private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=? where id=?";
@@ -97,7 +97,6 @@ class UserDao extends AbstractDao implements ModelDao<User>{
 	@Override
 	public List<User> getAll(boolean eager, String... fields){
 		Boolean eagerWorktask = Arrays.stream(fields).filter(e->e.equals("worktask")).findAny().isPresent();
-		List<Long> listId = getListId(null, getIdSql);
 
 		List<User> users = new ArrayList<>();
 		try {

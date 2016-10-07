@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by proton2 on 06.08.2016.
  */
-public class WorkTaskDao extends AbstractDao implements ModelDao<WorkTask> {
+public class WorkTaskDao implements ModelDao<WorkTask> {
     private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine) values (?, ?, ?, ?, ?)";
     private String deleteSql = "delete from WorkTask where id = ?";
     private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=? where id=?";
@@ -101,7 +101,6 @@ public class WorkTaskDao extends AbstractDao implements ModelDao<WorkTask> {
     @Override
     public List<WorkTask> getAll(boolean eager, String... fields) {
         Boolean eagerUser = Arrays.stream(fields).filter(e -> e.equals("user")).findAny().isPresent();
-        List<Long> listId = getListId(null, getIdSql);
 
         List<WorkTask> workTasks = new ArrayList<>();
         try {
@@ -167,7 +166,6 @@ public class WorkTaskDao extends AbstractDao implements ModelDao<WorkTask> {
     @Override
     public List<WorkTask> getListById(Long itemId, boolean eager, String... fields) {
         Boolean eagerUser = Arrays.stream(fields).filter(e -> e.equals("user")).findAny().isPresent();
-        List<Long> listId = getListId(itemId, getUserWorkTasksId);
 
         List<WorkTask> workTasks = new ArrayList<>();
         try {
