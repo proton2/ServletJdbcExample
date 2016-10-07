@@ -2,6 +2,7 @@ package com.java.servlets.controller;
 
 import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.User;
+import com.java.servlets.util.ServletHelper;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,8 +16,11 @@ public class UserController extends HttpServlet{
     private static String INSERT_OR_EDIT = "/user.jsp";
     private static String LIST_USER = "/listUser.jsp";
 
+	private ServletHelper helper;
+
     public UserController(){
     	super();
+		helper = new ServletHelper();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -47,19 +51,12 @@ public class UserController extends HttpServlet{
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	User user1 = new User();
-    	user1.setFirstName(request.getParameter("firstname"));
-    	user1.setLastName(request.getParameter("lastname"));
-    	user1.setCaption(request.getParameter("caption"));
-    	user1.setEmail(request.getParameter("email"));
-    	String userid = request.getParameter("id");
-
-    	if (userid == null || userid.isEmpty()){
+    	User user1 = helper.getUserFromRequest(request);
+    	if (user1.getId() == null){
 			DaoFactory.insert(user1);
     	}
     	else
     	{
-    		user1.setId(Long.parseLong(userid));
 			DaoFactory.update(user1);
     	}
     	RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
