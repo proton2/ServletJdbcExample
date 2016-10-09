@@ -22,6 +22,7 @@ public class WorkTaskController extends HttpServlet {
     private static String SELECT_USER = "/selectUser.jsp";
 
     private ServletHelper helper;
+    private String forward = "";
 
     public WorkTaskController(){
         super();
@@ -29,7 +30,6 @@ public class WorkTaskController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String forward = "";
         String action = request.getParameter("action");
 
         if (action.equalsIgnoreCase("delete")){
@@ -44,11 +44,6 @@ public class WorkTaskController extends HttpServlet {
             WorkTask workTask = (WorkTask) DaoFactory.getById(workTaskId, true, WorkTask.class, "user");
             request.setAttribute("taskuser", workTask.getTaskUser());
             request.setAttribute("workTask", workTask);
-            request.getSession().setAttribute("workTask", workTask);
-        }
-        else if (action.equalsIgnoreCase("select_user_list")) {
-            request.setAttribute("users", DaoFactory.getAll(User.class));
-            forward = SELECT_USER;
         }
         else if (action.equalsIgnoreCase("select_user")){
             Long userId = Long.parseLong(request.getParameter("id"));
@@ -69,18 +64,27 @@ public class WorkTaskController extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String buttonPressed = request.getParameter("button");
         WorkTask wt = helper.getWorkTaskFromRequest(request);
-        if (wt.getId() == null ){
-            DaoFactory.insert(wt);
+
+        if (buttonPressed.equalsIgnoreCase("Save")) {
+            if (wt.getId() == null) {
+                DaoFactory.insert(wt);
+            } else {
+                DaoFactory.update(wt);
+            }
+            request.getSession().removeAttribute("workTask");
+
+            forward = LIST_ITEMS;
+            request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class, "user"));
         }
-        else {
-            DaoFactory.update(wt);
+        else if (buttonPressed.equalsIgnoreCase("Set user")) {
+            request.getSession().setAttribute("workTask", wt);
+            request.setAttribute("users", DaoFactory.getAll(User.class));
+            forward = SELECT_USER;
         }
 
-        request.getSession().removeAttribute("workTask");
-
-        RequestDispatcher view = request.getRequestDispatcher(LIST_ITEMS);
-        request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class, "user"));
+        RequestDispatcher view = request.getRequestDispatcher(forward);
         view.forward(request, response);
     }
 }

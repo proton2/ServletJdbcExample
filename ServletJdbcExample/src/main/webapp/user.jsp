@@ -45,7 +45,7 @@
 	<tr>
 		<td></td>
 		<td>
-		    <input type = "submit" value = "Submit" />
+		    <input type = "submit" value = "Save user" name = "button"/>
 		</td>
 	</tr>
 	</table>

@@ -36,7 +36,7 @@
     	    <td><input type="text" readonly="readonly" name="taskuser_id" value="<c:out value="${taskuser.id}" />"/></td>
         </tr>
     	<tr>
-    		<td><a href = "WorkTaskController?action=select_user_list">Task user </a></td>
+    		<td> <input type = "submit" value = "Set user" name = "button"/>
     		<td>
     		    <a href = "UserController?action=edit&id=<c:out value = "${taskuser.id}"/>">${taskuser}</a>
     		</td>
@@ -71,7 +71,7 @@
     	<tr>
     		<td></td>
     		<td>
-    		    <input type = "submit" value = "Submit" />
+    		    <input type = "submit" value = "Save" name = "button"/>
     		</td>
     	</tr>
     	</table>
