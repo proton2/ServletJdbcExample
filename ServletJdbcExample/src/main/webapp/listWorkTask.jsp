@@ -20,6 +20,7 @@
     				<th>Caption </th>
     				<th>Task Date </th>
     				<th>Dead Line </th>
+    				<th>Task status </th>
     				<th colspan=2>Action</th>
     			</tr>
     		</thead>
@@ -31,6 +32,7 @@
     					<td><c:out value="${workTask.caption}"/></td>
     					<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.taskDate}" /></td>
     					<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.deadLine}" /></td>
+    					<td><c:out value="${workTask.taskStatus}"/></td>
     					<td><a href = "WorkTaskController?action=edit&id=<c:out value = "${workTask.id}"/>">Update</a></td>
     					<td><a href = "WorkTaskController?action=delete&id=<c:out value = "${workTask.id}"/>">Delete</a></td>
     				</tr>

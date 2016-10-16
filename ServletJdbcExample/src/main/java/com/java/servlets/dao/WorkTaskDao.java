@@ -1,6 +1,7 @@
 package com.java.servlets.dao;
 
 import com.java.servlets.model.Model;
+import com.java.servlets.model.TaskStatus;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
@@ -17,9 +18,9 @@ import java.util.List;
  * Created by proton2 on 06.08.2016.
  */
 public class WorkTaskDao implements ModelDao<WorkTask> {
-    private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine) values (?, ?, ?, ?, ?)";
+    private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from WorkTask where id = ?";
-    private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=? where id=?";
+    private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?";
     private String getAllSql = "select * from WorkTask";
     private String getIdSql = "select id from WorkTask";
     private String getByIdSql = "select * from WorkTask where id = ?";
@@ -43,6 +44,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             ps.setString(3, wt.getTaskContext());
             ps.setDate(4, new java.sql.Date(wt.getTaskDate().getTime()));
             ps.setDate(5, new java.sql.Date(wt.getDeadLine().getTime()));
+            ps.setInt(6, wt.getTaskStatus().ordinal());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -76,7 +78,8 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             ps.setString(3, wt.getTaskContext());
             ps.setDate(4, new java.sql.Date(wt.getTaskDate().getTime()));
             ps.setDate(5, new java.sql.Date(wt.getDeadLine().getTime()));
-            ps.setLong(6, item.getId());
+            ps.setInt(6, wt.getTaskStatus().ordinal());
+            ps.setLong(7, item.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,6 +119,13 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     workTask.setTaskDate(rs.getDate("taskdate"));
                     workTask.setDeadLine(rs.getDate("deadline"));
                     workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), eagerUser, User.class));
+
+                    int t_stat = rs.getInt("taskstatus_id");
+                    workTask.setTaskStatus(t_stat == 0
+                            ? TaskStatus.NEW
+                            : (t_stat == 1 ?
+                                TaskStatus.CLOSED
+                                : TaskStatus.ACTUAL));
                 }
                 workTasks.add(workTask);
             }
@@ -153,6 +163,12 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     wt.setTaskDate(rs.getDate("taskdate"));
                     wt.setDeadLine(rs.getDate("deadline"));
                     wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), eagerUser, User.class));
+                    int t_stat = rs.getInt("taskstatus_id");
+                    wt.setTaskStatus(t_stat == 0
+                            ? TaskStatus.NEW
+                            : (t_stat == 1 ?
+                            TaskStatus.CLOSED
+                            : TaskStatus.ACTUAL));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -181,6 +197,12 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     workTask.setTaskDate(rs.getDate("taskdate"));
                     workTask.setDeadLine(rs.getDate("deadline"));
                     workTask.setTaskUser((User) DaoFactory.getById(itemId, eagerUser, User.class));
+                    int t_stat = rs.getInt("taskstatus_id");
+                    workTask.setTaskStatus(t_stat == 0
+                            ? TaskStatus.NEW
+                            : (t_stat == 1 ?
+                            TaskStatus.CLOSED
+                            : TaskStatus.ACTUAL));
                 }
                 workTasks.add(workTask);
             }

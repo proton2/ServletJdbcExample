@@ -19,6 +19,8 @@ public class WorkTask extends Model{
     private Date taskDate;
     @Column(name="deadline")
     private Date deadLine;
+    @Column(name="taskStatus")
+    private TaskStatus taskStatus;
 
     public User getTaskUser() {
         return taskUser;
@@ -58,6 +60,14 @@ public class WorkTask extends Model{
 
     public void setDeadLine(Date deadLine) {
         this.deadLine = deadLine;
+    }
+
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
     @Override

@@ -68,6 +68,16 @@
     	        <textarea name="textarea1" rows="5" cols="27"><c:out value="${workTask.taskContext}"/> </textarea>
     	    </td>
         </tr>
+        <tr>
+            <td>Task status</td>
+            <td>
+                <select name="taskstatus">
+                    <option value = 0 ${workTask.taskStatus == 'NEW' ? 'selected' : ''}> New </option>
+                    <option value = 1 ${workTask.taskStatus == 'CLOSED' ? 'selected' : ''}> Closed</option>
+                    <option value = 2 ${workTask.taskStatus == 'ACTUAL' ? 'selected' : ''}> Actual</option>
+                </select>
+            </td>
+            </tr>
     	<tr>
     		<td></td>
     		<td>

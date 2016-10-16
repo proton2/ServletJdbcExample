@@ -1,6 +1,7 @@
 package com.java.servlets.util;
 
 import com.java.servlets.dao.DaoFactory;
+import com.java.servlets.model.TaskStatus;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
 
@@ -30,6 +31,7 @@ public class ServletHelper {
 
         wt.setCaption(request.getParameter("caption"));
         wt.setTaskContext(request.getParameter("textarea1"));
+        wt.setTaskStatus(TaskStatus.values()[Integer.parseInt(request.getParameter("taskstatus"))]);
 
         try {
             Date taskdate = new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("taskDate"));
