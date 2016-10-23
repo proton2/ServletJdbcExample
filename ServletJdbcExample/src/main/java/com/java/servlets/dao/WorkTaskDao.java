@@ -10,8 +10,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,12 +19,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from WorkTask where id = ?";
     private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?";
-    private String getAllSql = "select * from WorkTask";
-    private String getIdSql = "select id from WorkTask";
     private String getByIdSql = "select * from WorkTask where id = ?";
-
-    private String getUserWorkTasks = "select * from WorkTask where taskuser_id = ?";
-    private String getUserWorkTasksId = "select id from WorkTask where taskuser_id = ?";
 
     private Connection connection;
 
@@ -37,7 +30,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     @Override
     public Long insert(Model item) {
         try {
-            WorkTask wt = (WorkTask)item;
+            WorkTask wt = (WorkTask) item;
             PreparedStatement ps = connection.prepareStatement(insertSql);
             ps.setLong(1, wt.getTaskUser().getId());
             ps.setString(2, wt.getCaption());
@@ -71,7 +64,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
         Cache cache = EHCacheManger.getCache();
         cache.remove(item.getId());
         try {
-            WorkTask wt = (WorkTask)item;
+            WorkTask wt = (WorkTask) item;
             PreparedStatement ps = connection.prepareStatement(updateSql);
             ps.setLong(1, wt.getTaskUser().getId());
             ps.setString(2, wt.getCaption());
@@ -102,114 +95,48 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
-    public List<WorkTask> getAll(boolean eager, String... fields) {
-        Boolean eagerUser = Arrays.stream(fields).filter(e -> e.equals("user")).findAny().isPresent();
-
-        List<WorkTask> workTasks = new ArrayList<>();
-        try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery(eager ? getAllSql : getIdSql);
-
-            while (rs.next()) {
-                WorkTask workTask = new WorkTask();
-                workTask.setId(rs.getLong("id"));
-                if (eager) {
-                    workTask.setCaption(rs.getString("caption"));
-                    workTask.setTaskContext(rs.getString("taskcontext"));
-                    workTask.setTaskDate(rs.getDate("taskdate"));
-                    workTask.setDeadLine(rs.getDate("deadline"));
-                    workTask.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), eagerUser, User.class));
-
-                    int t_stat = rs.getInt("taskstatus_id");
-                    workTask.setTaskStatus(t_stat == 0
-                            ? TaskStatus.NEW
-                            : (t_stat == 1 ?
-                                TaskStatus.CLOSED
-                                : TaskStatus.ACTUAL));
-                }
-                workTasks.add(workTask);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return workTasks;
-    }
-
-    @Override
-    public WorkTask getById(Long itemId, boolean eager, String... joinFields) {
+    public WorkTask getById(Long itemId) {
         WorkTask wt = null;
-        Boolean eagerUser = Arrays.stream(joinFields).filter(e -> e.equals("user")).findAny().isPresent();
-
         Cache cache = EHCacheManger.getCache();
         Element element = cache.get(itemId);
-        if (element != null){
+        if (element != null) {
             wt = (WorkTask) element.getObjectValue();
-            wt.setTaskUser((User) DaoFactory.getById(wt.getTaskUser().getId(), eagerUser, User.class));
             return wt;
         }
 
         wt = new WorkTask();
         wt.setId(itemId);
-        if (eager) {
-            try {
-                PreparedStatement ps = connection.prepareStatement(getByIdSql);
-                ps.setLong(1, itemId);
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    wt.setId(rs.getLong("id"));
-                    wt.setCaption(rs.getString("caption"));
-                    wt.setTaskContext(rs.getString("taskcontext"));
-                    wt.setTaskDate(rs.getDate("taskdate"));
-                    wt.setDeadLine(rs.getDate("deadline"));
-                    wt.setTaskUser((User) DaoFactory.getById(rs.getLong("taskuser_id"), eagerUser, User.class));
-                    int t_stat = rs.getInt("taskstatus_id");
-                    wt.setTaskStatus(t_stat == 0
-                            ? TaskStatus.NEW
-                            : (t_stat == 1 ?
-                            TaskStatus.CLOSED
-                            : TaskStatus.ACTUAL));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement ps = connection.prepareStatement(getByIdSql);
+            ps.setLong(1, itemId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                wt.setCaption(rs.getString("caption"));
+                wt.setTaskContext(rs.getString("taskcontext"));
+                wt.setTaskDate(rs.getDate("taskdate"));
+                wt.setDeadLine(rs.getDate("deadline"));
+                User user = new User();
+                user.setId(rs.getLong("taskuser_id"));
+                wt.setTaskUser(user);
+                int t_stat = rs.getInt("taskstatus_id");
+                wt.setTaskStatus(t_stat == 0 ? TaskStatus.NEW : (t_stat == 1 ? TaskStatus.CLOSED : TaskStatus.ACTUAL));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
 
         cache.put(new Element(itemId, wt));
         return wt;
     }
 
     @Override
-    public List<WorkTask> getListById(Long itemId, boolean eager, String... fields) {
-        Boolean eagerUser = Arrays.stream(fields).filter(e -> e.equals("user")).findAny().isPresent();
+    public List<WorkTask> getListById(Long itemId) {
+        return null;
+    }
 
-        List<WorkTask> workTasks = new ArrayList<>();
-        try {
-            PreparedStatement ps = connection.prepareStatement(eager ? getUserWorkTasks : getUserWorkTasksId);
-            ps.setLong(1, itemId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                WorkTask workTask = new WorkTask();
-                workTask.setId(rs.getLong("id"));
-                if (eager) {
-                    workTask.setCaption(rs.getString("caption"));
-                    workTask.setTaskContext(rs.getString("taskcontext"));
-                    workTask.setTaskDate(rs.getDate("taskdate"));
-                    workTask.setDeadLine(rs.getDate("deadline"));
-                    workTask.setTaskUser((User) DaoFactory.getById(itemId, eagerUser, User.class));
-                    int t_stat = rs.getInt("taskstatus_id");
-                    workTask.setTaskStatus(t_stat == 0
-                            ? TaskStatus.NEW
-                            : (t_stat == 1 ?
-                            TaskStatus.CLOSED
-                            : TaskStatus.ACTUAL));
-                }
-                workTasks.add(workTask);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return workTasks;
+    @Override
+    public List<WorkTask> getAll() {
+        return null;
     }
 }

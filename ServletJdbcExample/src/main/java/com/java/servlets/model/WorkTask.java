@@ -1,25 +1,16 @@
 package com.java.servlets.model;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by proton2 on 06.08.2016.
  */
-@Entity
-@Table(name="worktask")
-public class WorkTask extends Model{
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="taskuser_id")
+public class WorkTask extends Model {
     private User taskUser;
     private String caption;
-    @Column(name="taskcontext")
     private String taskContext;
-    @Column(name="taskdate")
     private Date taskDate;
-    @Column(name="deadline")
     private Date deadLine;
-    @Column(name="taskStatus")
     private TaskStatus taskStatus;
 
     public User getTaskUser() {

@@ -64,7 +64,7 @@
     			</tr>
     		</thead>
     		<tbody>
-    			<c:forEach items="${user.userTasks}" var = "workTask">
+    			<c:forEach items="${userTasks}" var = "workTask">
     				<tr>
     					<td><c:out value="${workTask.id}"/></td>
     					<td><c:out value="${workTask.caption}"/></td>

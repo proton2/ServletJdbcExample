@@ -1,26 +1,15 @@
 package com.java.servlets.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.Collection;
 
-@Entity
-@Table(name="usertable")
 public class User extends Model{
-	@Column(name="firstname")
 	private String firstName;
-	@Column(name="lastname")
 	private String lastName;
-	@Column(name="caption")
 	private String caption;
-	@Column(name="email")
 	private String email;
-
     private Collection<WorkTask> userTasks;
 
-    public User() {
-    }
+    public User() {}
 
     public User (Long userId){
         super.setId(userId);

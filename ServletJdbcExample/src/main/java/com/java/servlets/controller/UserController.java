@@ -2,6 +2,8 @@ package com.java.servlets.controller;
 
 import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.User;
+import com.java.servlets.model.UserView;
+import com.java.servlets.model.WorkTaskView;
 import com.java.servlets.util.ServletHelper;
 
 import javax.servlet.RequestDispatcher;
@@ -38,10 +40,11 @@ public class UserController extends HttpServlet{
     		Long userId = Long.parseLong(request.getParameter("id"));
     		User user = (User) DaoFactory.getById(userId, true, User.class, "worktask");
 			request.setAttribute("user", user);
+			request.setAttribute("userTasks", DaoFactory.getListById(user.getId(), WorkTaskView.class));
     	}
 		else if (action.equalsIgnoreCase("list")){
     		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getAll(User.class));
+    		request.setAttribute("users", DaoFactory.getAll(UserView.class));
     	} else {
     		forward = INSERT_OR_EDIT;
     	}
@@ -60,7 +63,7 @@ public class UserController extends HttpServlet{
 			DaoFactory.update(user1);
     	}
     	RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
-    	request.setAttribute("users", DaoFactory.getAll(User.class));
+    	request.setAttribute("users", DaoFactory.getAll(UserView.class));
     	view.forward(request, response);
     }
 }
