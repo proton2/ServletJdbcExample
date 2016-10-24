@@ -28,7 +28,7 @@ public class DaoFactory {
         return creator;
     }
 
-    public static Model getById(Long id, boolean eager, Class<? extends Model> dtoClass, String... joinFields) {
+    public static Model getById(Long id, Class<? extends Model> dtoClass) {
         return getDao(dtoClass).getById(id);
     }
 

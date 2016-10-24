@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class UserViewDao implements ModelDao<UserView> {
     private String getAllSql = "select id, firstname, lastname, caption, email from usertable";
-    private String getUserSql = "select firstname, lastname from usertable where id = ?";
 
     private Connection connection;
 
@@ -54,7 +53,6 @@ public class UserViewDao implements ModelDao<UserView> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return users;
     }
 
@@ -63,23 +61,8 @@ public class UserViewDao implements ModelDao<UserView> {
         return null;
     }
 
-
     @Override
     public UserView getById(Long userId) {
-        UserView user = new UserView();
-        user.setId(userId);
-        try {
-            PreparedStatement ps = connection.prepareStatement(getUserSql);
-            ps.setLong(1, userId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                user.setFirstName(rs.getString("firstname"));
-                user.setLastName(rs.getString("lastname"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return user;
+        return null;
     }
 }

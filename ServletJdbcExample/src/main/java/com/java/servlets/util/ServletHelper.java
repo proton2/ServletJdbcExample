@@ -25,7 +25,7 @@ public class ServletHelper {
         String userIdStr = request.getParameter("taskuser_id");
         if (userIdStr!=null && !userIdStr.isEmpty()) {
             Long userId = Long.parseLong(userIdStr);
-            User user = (User) DaoFactory.getById(userId, true, User.class);
+            User user = (User) DaoFactory.getById(userId, User.class);
             wt.setTaskUser(user);
         }
 

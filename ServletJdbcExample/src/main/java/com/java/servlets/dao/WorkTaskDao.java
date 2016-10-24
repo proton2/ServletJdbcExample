@@ -19,7 +19,9 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from WorkTask where id = ?";
     private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?";
-    private String getByIdSql = "select * from WorkTask where id = ?";
+    private String getById = "select w.id, w.caption, w.taskContext, w.taskDate, w.deadLine, w.taskstatus_id, w.taskuser_id, u.firstName, u.lastName\n" +
+            "from WorkTask w join usertable u on w.taskuser_id = u.id\n" +
+            "where w.id = ?";
 
     private Connection connection;
 
@@ -107,7 +109,7 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
         wt = new WorkTask();
         wt.setId(itemId);
         try {
-            PreparedStatement ps = connection.prepareStatement(getByIdSql);
+            PreparedStatement ps = connection.prepareStatement(getById);
             ps.setLong(1, itemId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -115,16 +117,19 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                 wt.setTaskContext(rs.getString("taskcontext"));
                 wt.setTaskDate(rs.getDate("taskdate"));
                 wt.setDeadLine(rs.getDate("deadline"));
-                User user = new User();
-                user.setId(rs.getLong("taskuser_id"));
-                wt.setTaskUser(user);
+
                 int t_stat = rs.getInt("taskstatus_id");
                 wt.setTaskStatus(t_stat == 0 ? TaskStatus.NEW : (t_stat == 1 ? TaskStatus.CLOSED : TaskStatus.ACTUAL));
+
+                User user = new User();
+                user.setId(rs.getLong("taskuser_id"));
+                user.setFirstName(rs.getString("firstname"));
+                user.setLastName(rs.getString("lastname"));
+                wt.setTaskUser(user);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
 
         cache.put(new Element(itemId, wt));
         return wt;
