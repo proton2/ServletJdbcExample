@@ -10,6 +10,12 @@ import java.util.Properties;
 
 public class DbUtil {
 	private static Connection connection = null;
+
+	private static String dbproperties;
+
+	public static void setDbproperties(String dbproperties) {
+		DbUtil.dbproperties = dbproperties;
+	}
 	
 	public static Connection getConnection() {
 		if (connection != null){
@@ -18,7 +24,7 @@ public class DbUtil {
 		else {
 			try{
 				Properties prop = new Properties();
-				InputStream inputStream = DbUtil.class.getClassLoader().getResourceAsStream("db.properties");
+				InputStream inputStream = DbUtil.class.getClassLoader().getResourceAsStream(dbproperties);
                 prop.load(inputStream);
                 String driver = prop.getProperty("driver");
                 String url = prop.getProperty("url");

@@ -9,6 +9,7 @@ public class AppContextListener implements ServletContextListener{
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+		DbUtil.setDbproperties(sce.getServletContext().getInitParameter("dbproperties"));
 		DbUtil.getConnection();
 		System.out.println("------debug----- context initialized success");
 	}
