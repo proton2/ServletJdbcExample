@@ -42,12 +42,35 @@
 		    <input type = "text" name = "email" value = "<c:out value="${user.email}" />" /><br>
 		</td>
 	</tr>
+
+    <c:choose>
+    <c:when test="${sessionScope.user eq user.login}">
+
+	<tr>
+    	<td>login : </td>
+    	<td>
+            <input type = "text" name = "login" value = "<c:out value="${user.login}" />" /><br>
+    	</td>
+    </tr>
+
+    <tr>
+    	<td>password : </td>
+    	<td>
+            <input type = "password" name = "password" value = "*********" /><br>
+    	</td>
+    </tr>
+
 	<tr>
 		<td></td>
 		<td>
-		    <input type = "submit" value = "Save user" name = "button"/>
+	        <input type = "submit" value = "Save user" name = "button"/>
 		</td>
 	</tr>
+
+	</c:when>
+	<c:otherwise> <tr><td>access denited!</td></tr> </c:otherwise>
+	</c:choose>
+
 	</table>
 	</form>
 

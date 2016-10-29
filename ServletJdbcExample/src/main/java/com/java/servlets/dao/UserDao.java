@@ -11,9 +11,9 @@ import java.sql.*;
 import java.util.List;
 
 class UserDao implements ModelDao<User> {
-    private String insertSql = "insert into usertable(firstname, lastname, caption, email) values (?, ?, ?, ?)";
+    private String insertSql = "insert into usertable(firstname, lastname, caption, email) values (?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from usertable where id = ?";
-    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=? where id=?";
+    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=? where id=?";
     private String getUserSql = "select * from usertable where id = ?";
 
     private Connection connection;
@@ -31,6 +31,8 @@ class UserDao implements ModelDao<User> {
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getCaption());
             ps.setString(4, user.getEmail());
+            ps.setString(5, user.getLogin());
+            ps.setString(6, user.getPassword());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,7 +65,9 @@ class UserDao implements ModelDao<User> {
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getCaption());
             ps.setString(4, user.getEmail());
-            ps.setLong(5, user.getId());
+            ps.setString(5, user.getLogin());
+            ps.setString(6, user.getPassword());
+            ps.setLong(7, user.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,6 +108,8 @@ class UserDao implements ModelDao<User> {
                 user.setLastName(rs.getString("lastname"));
                 user.setCaption(rs.getString("caption"));
                 user.setEmail(rs.getString("email"));
+                user.setLogin(rs.getString("login"));
+                user.setPassword(rs.getString("password"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

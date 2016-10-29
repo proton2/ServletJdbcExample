@@ -56,6 +56,8 @@ public class ServletHelper {
         user.setLastName(request.getParameter("lastname"));
         user.setCaption(request.getParameter("caption"));
         user.setEmail(request.getParameter("email"));
+        user.setLogin(request.getParameter("login"));
+        user.setPassword(request.getParameter("password"));
 
         String id = request.getParameter("id");
         if (id!=null && !id.isEmpty()){

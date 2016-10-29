@@ -8,6 +8,8 @@ public class User extends Model{
 	private String caption;
 	private String email;
     private Collection<WorkTask> userTasks;
+    private String login;
+    private String password;
 
     public User() {}
 
@@ -53,6 +55,22 @@ public class User extends Model{
 
     public void setUserTasks(Collection<WorkTask> userTasks) {
         this.userTasks = userTasks;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     @Override

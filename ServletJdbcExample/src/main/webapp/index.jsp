@@ -8,7 +8,7 @@
 </head>
 
 <body>
-	<jsp:forward page="/WorkTaskController?action=list" />
+<!--	<jsp:forward page="/LoginServlet"> -->
 </body>
 
 </html>
