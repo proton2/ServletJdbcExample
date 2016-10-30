@@ -44,7 +44,7 @@
 	</tr>
 
     <c:choose>
-    <c:when test="${sessionScope.user eq user.login}">
+    <c:when test="${sessionScope.role == 'admin'}">
 
 	<tr>
     	<td>login : </td>
@@ -58,6 +58,17 @@
     	<td>
             <input type = "password" name = "password" value = "*********" /><br>
     	</td>
+    </tr>
+
+    <tr>
+        <td>User role</td>
+        <td>
+            <select name="role">
+                <option value = 0 ${user.role == 'admin' ? 'selected' : ''}> admin </option>
+                <option value = 1 ${user.role == 'boss' ? 'selected' : ''}> boss </option>
+                <option value = 2 ${user.role == 'user' ? 'selected' : ''}> user </option>
+            </select>
+        </td>
     </tr>
 
 	<tr>

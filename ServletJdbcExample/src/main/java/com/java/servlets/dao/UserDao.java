@@ -2,6 +2,7 @@ package com.java.servlets.dao;
 
 import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
+import com.java.servlets.model.UserRole;
 import com.java.servlets.util.DbUtil;
 import com.java.servlets.util.EHCacheManger;
 import net.sf.ehcache.Cache;
@@ -11,9 +12,9 @@ import java.sql.*;
 import java.util.List;
 
 class UserDao implements ModelDao<User> {
-    private String insertSql = "insert into usertable(firstname, lastname, caption, email) values (?, ?, ?, ?, ?, ?)";
+    private String insertSql = "insert into usertable(firstname, lastname, caption, email, login, password, role) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from usertable where id = ?";
-    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=? where id=?";
+    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role=? where id=?";
     private String getUserSql = "select * from usertable where id = ?";
 
     private Connection connection;
@@ -33,6 +34,7 @@ class UserDao implements ModelDao<User> {
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getLogin());
             ps.setString(6, user.getPassword());
+            ps.setInt(7, user.getRole().ordinal());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,7 +69,8 @@ class UserDao implements ModelDao<User> {
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getLogin());
             ps.setString(6, user.getPassword());
-            ps.setLong(7, user.getId());
+            ps.setInt(7, user.getRole().ordinal());
+            ps.setLong(8, user.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -110,6 +113,9 @@ class UserDao implements ModelDao<User> {
                 user.setEmail(rs.getString("email"));
                 user.setLogin(rs.getString("login"));
                 user.setPassword(rs.getString("password"));
+
+                int role_id = rs.getInt("role_id");
+                user.setRole(role_id == 0 ? UserRole.admin : (role_id == 1 ? UserRole.boss : UserRole.user));
             }
         } catch (SQLException e) {
             e.printStackTrace();

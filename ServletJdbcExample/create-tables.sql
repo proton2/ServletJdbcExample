@@ -17,6 +17,7 @@ create table if not exists public.usertable (
 	email varchar(255),
 	login varchar(255) UNIQUE,
 	password varchar(255),
+	role_id integer,
 	CONSTRAINT usertablepk PRIMARY KEY (id)
 );
 
@@ -34,28 +35,30 @@ create table if not exists public.worktask(
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru', 'stx1', '222');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru', 'vpt', '333');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru', 'ast', '444');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru', 'test1', '555');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru', 'test2', '666');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru', 'admin-gr', '777');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru', 'gr-1', '888');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru', 'gr-2', '999');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru', 'gr-3', '101');
-insert into public.usertable (caption, firstname, lastname, email, login, password) values
-('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru', 'lead', '102');
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru', 'stx1', '222', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru', 'vpt', '333', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru', 'ast', '444', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru', 'test1', '555', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru', 'test2', '666', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru', 'admin-gr', '777', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru', 'gr-1', '888', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru', 'gr-2', '999', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru', 'gr-3', '101', 2);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru', 'lead', '102', 1);
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
+('administrator', 'Admin', 'Admin', 'admin@mycomp.ru', 'root', 'root', 0);
 
 insert into public.worktask (caption, taskdate, deadline, taskcontext, taskuser_id, taskstatus_id) values
 ('Test task', '04.09.2016', '05.09.2016', 'test current build', (select id from usertable where usertable.email='test2@mycomp.ru'), 0);

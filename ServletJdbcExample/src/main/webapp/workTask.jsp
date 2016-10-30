@@ -77,7 +77,7 @@
                     <option value = 2 ${workTask.taskStatus == 'ACTUAL' ? 'selected' : ''}> Actual</option>
                 </select>
             </td>
-            </tr>
+        </tr>
     	<tr>
     		<td></td>
     		<td>

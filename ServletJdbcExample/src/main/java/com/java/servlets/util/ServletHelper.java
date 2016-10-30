@@ -3,6 +3,7 @@ package com.java.servlets.util;
 import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.TaskStatus;
 import com.java.servlets.model.User;
+import com.java.servlets.model.UserRole;
 import com.java.servlets.model.WorkTask;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,6 +59,7 @@ public class ServletHelper {
         user.setEmail(request.getParameter("email"));
         user.setLogin(request.getParameter("login"));
         user.setPassword(request.getParameter("password"));
+        user.setRole(UserRole.values()[Integer.parseInt(request.getParameter("role"))]);
 
         String id = request.getParameter("id");
         if (id!=null && !id.isEmpty()){

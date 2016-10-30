@@ -1,6 +1,7 @@
 package com.java.servlets.controller;
 
 import com.java.servlets.dao.AuthorizationDao;
+import com.java.servlets.model.UserRole;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -43,10 +44,11 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
 
         AuthorizationDao dao = new AuthorizationDao();
-        boolean access = dao.checkAccess(login, password);
-        if (access) {
+        UserRole role = dao.checkAccess(login, password);
+        if (role!=null) {
             HttpSession session = req.getSession();
             session.setAttribute("user", login);
+            session.setAttribute("role", role);
             session.setMaxInactiveInterval(30 * 60);
             resp.sendRedirect("/ServletJdbcExample" + LIST_ITEMS);
         } else {

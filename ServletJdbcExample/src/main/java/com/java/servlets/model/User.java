@@ -10,6 +10,7 @@ public class User extends Model{
     private Collection<WorkTask> userTasks;
     private String login;
     private String password;
+    private UserRole role;
 
     public User() {}
 
@@ -71,6 +72,14 @@ public class User extends Model{
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     @Override
