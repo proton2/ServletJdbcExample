@@ -42,6 +42,10 @@ public class UserController extends HttpServlet{
 			request.setAttribute("user", user);
 			request.setAttribute("userTasks", DaoFactory.getListById(user.getId(), WorkTaskView.class));
     	}
+		else if (action.equalsIgnoreCase("insert")){
+			forward = INSERT_OR_EDIT;
+			request.setAttribute("user", new User());
+		}
 		else if (action.equalsIgnoreCase("list")){
     		forward = LIST_USER;
     		request.setAttribute("users", DaoFactory.getAll(UserView.class));

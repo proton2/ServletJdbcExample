@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.List;
 
 class UserDao implements ModelDao<User> {
-    private String insertSql = "insert into usertable(firstname, lastname, caption, email, login, password, role) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private String insertSql = "insert into usertable(firstname, lastname, caption, email, login, password, role_id) values (?, ?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from usertable where id = ?";
     private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role=? where id=?";
     private String getUserSql = "select * from usertable where id = ?";
@@ -25,8 +25,8 @@ class UserDao implements ModelDao<User> {
 
     @Override
     public Long insert(Model item) {
+        User user = (User) item;
         try {
-            User user = (User) item;
             PreparedStatement ps = connection.prepareStatement(insertSql);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -43,15 +43,16 @@ class UserDao implements ModelDao<User> {
         Long insertId = -1L;
         try {
             Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery("SELECT max(id) FROM User");
+            ResultSet result = select.executeQuery("SELECT max(id) FROM usertable");
             while (result.next()) {
                 insertId = result.getLong(1);
+                user.setId(insertId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         Cache cache = EHCacheManger.getCache();
-        cache.put(new Element(insertId, item));
+        cache.put(new Element(insertId, user));
 
         return insertId;
     }

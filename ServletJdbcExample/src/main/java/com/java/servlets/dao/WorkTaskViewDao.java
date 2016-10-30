@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Created by proton2 on 23.10.2016.
  */
-public class WorkTaskViewDao implements ModelDao<WorkTaskView>{
-    private String getAllSql = "select w.id, w.caption, w.taskDate, w.deadLine, w.taskstatus_id, u.firstName, u.lastName\n"+
+public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
+    private String getAllSql = "select w.id, w.caption, w.taskDate, w.deadLine, w.taskstatus_id, u.firstName, u.lastName\n" +
             "from WorkTask w\n" +
             "join usertable u on w.taskuser_id = u.id\n";
-    private String getUserWorkTasks = "select id, caption, taskDate, deadLine, taskstatus_id\n"+
+    private String getUserWorkTasks = "select id, caption, taskDate, deadLine, taskstatus_id\n" +
             "from WorkTask where taskuser_id = ?";
 
     private Connection connection;
