@@ -9,21 +9,25 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
         </encoder>
     </appender>
-
     <appender name="LOGFILE" class="ch.qos.logback.core.FileAppender">
-        <file>${catalina.base}/logs/tomcat.log</file>
+        <file>${catalina.base}/logs/autorization.log</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="com.java.servlets.controller.LoginServlet" level="INFO"/>
+
+    <logger name="com.java.servlets.controller.LoginServlet" level="INFO" additivity="false">
+		<appender-ref ref="LOGFILE" />
+	</logger>
+    <logger name="com.java.servlets.listener.AppContextListener" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
 
     <!-- Strictly speaking, the level attribute is not necessary since -->
     <!-- the level of the root level is set to DEBUG by default.       -->
-    <root level="DEBUG">
+    <root>
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="LOGFILE" />
     </root>
 
 </configuration>
