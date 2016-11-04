@@ -111,7 +111,6 @@
     		</tbody>
     	</table>
 
-	<p><a href = "UserController?action=list">Return to list users</a></p>
 	<button type="button" name="back" onclick="history.back()">back</button>
 </body>
 </html>

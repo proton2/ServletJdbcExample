@@ -85,8 +85,43 @@
     		</td>
     	</tr>
     	</table>
-    	</form>
+    </form>
 
-    <p><a href = "WorkTaskController?action=list">Return to list tasks</a></p>
+    <br>
+    Attaches:
+    <table border=1>
+        <thead>
+            <tr>
+                <th>Id </th>
+                <th>File name </th>
+                <th>Caption </th>
+                <th colspan=2>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach items="${attaches}" var = "atth">
+        	<tr>
+        	    <td>${atth.id}</td>
+        		<td>
+        		<a href = "WorkTaskController?action=download_attach&att_filename=<c:out value = "${atth.fileName}"/>">${atth.fileName}</a>
+        		</td>
+        		<td>${atth.caption}</td>
+
+        		<td>
+        		<c:choose><c:when test="${sessionScope.role == 'admin'}">
+        		<a href = "WorkTaskController?action=edit_attach&attach_id=<c:out value = "${atth.id}"/>&worktask_id=<c:out value = "${workTask.id}"/>">Update</a>
+        		</c:when></c:choose>
+        		</td>
+        		<td>
+        		<c:choose><c:when test="${sessionScope.role == 'admin'}">
+        		<a href = "WorkTaskController?action=delete_attach&attach_id=<c:out value = "${atth.id}"/>&worktask_id=<c:out value = "${workTask.id}"/>&att_filename=<c:out value = "${atth.fileName}"/>">Delete</a>
+        		</c:when></c:choose>
+        		</td>
+
+            </tr>
+        	</c:forEach>
+        </tbody>
+    </table>
+    <p><a href = "WorkTaskController?action=insert_attach&worktask_id=<c:out value = "${workTask.id}"/>">Insert attach</a></p>
 </body>
 </html>

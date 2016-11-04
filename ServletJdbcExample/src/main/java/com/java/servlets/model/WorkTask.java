@@ -1,5 +1,6 @@
 package com.java.servlets.model;
 
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -12,6 +13,7 @@ public class WorkTask extends Model {
     private Date taskDate;
     private Date deadLine;
     private TaskStatus taskStatus;
+    private Collection<Attach> attaches;
 
     public User getTaskUser() {
         return taskUser;
@@ -59,6 +61,14 @@ public class WorkTask extends Model {
 
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public Collection<Attach> getAttaches() {
+        return attaches;
+    }
+
+    public void setAttaches(Collection<Attach> attaches) {
+        this.attaches = attaches;
     }
 
     @Override

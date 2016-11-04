@@ -13,6 +13,26 @@
         <param-name>dbproperties</param-name>
         <param-value>db.properties</param-value>
     </context-param>
+    <context-param>
+        <param-name>uploads</param-name>
+        <param-value>c:\mydemoapp\uploads</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>AttachController</servlet-name>
+        <servlet-class>com.java.servlets.controller.AttachController</servlet-class>
+        <multipart-config>
+            <multipart-config>
+                <max-file-size>10485760</max-file-size>
+                <max-request-size>20971520</max-request-size>
+                <file-size-threshold>5242880</file-size-threshold>
+            </multipart-config>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AttachController</servlet-name>
+        <url-pattern>/AttachController</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <display-name>UserController</display-name>
@@ -43,6 +63,15 @@
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DownloadServlet</servlet-name>
+        <servlet-class>com.java.servlets.controller.DownloadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DownloadServlet</servlet-name>
+        <url-pattern>/download</url-pattern>
     </servlet-mapping>
     
     <listener>

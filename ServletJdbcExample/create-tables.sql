@@ -35,6 +35,17 @@ create table if not exists public.worktask(
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+create table if not exists public.attach (
+	id bigint not null default nextval('hibernate_sequence'::regclass),
+	filename varchar(255) UNIQUE,
+	caption varchar(512),
+	worktask_id bigint,
+	CONSTRAINT attachpk PRIMARY KEY (id),
+	CONSTRAINT fk_worktask_id FOREIGN KEY (worktask_id)
+	REFERENCES public.worktask (id) MATCH SIMPLE
+	ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
 ('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111', 2);
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
