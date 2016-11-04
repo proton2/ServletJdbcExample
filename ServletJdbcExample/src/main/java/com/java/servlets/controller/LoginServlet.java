@@ -2,6 +2,8 @@ package com.java.servlets.controller;
 
 import com.java.servlets.dao.AuthorizationDao;
 import com.java.servlets.model.UserRole;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,12 +22,16 @@ public class LoginServlet extends HttpServlet {
     private static String LOGIN_PAGE = "/login.jsp";
     private String forward = "";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServlet.class);
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
         if (action != null && action.equalsIgnoreCase("logout")) {
             HttpSession session = request.getSession(false);
             if (session != null) {
+                LOGGER.info(String.format("User logout: %s, role: %s",
+                        session.getAttribute("user"), session.getAttribute("role")));
                 session.invalidate();
             }
             forward = LOGIN_PAGE;
@@ -50,8 +56,10 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", login);
             session.setAttribute("role", role);
             session.setMaxInactiveInterval(30 * 60);
+            LOGGER.info(String.format("Login successfull: login = %s, role: %s", login, session.getAttribute("role")));
             resp.sendRedirect("/ServletJdbcExample" + LIST_ITEMS);
         } else {
+            LOGGER.info(String.format("Login unsuccessfull: login = %s, password: %s.", login, password));
             RequestDispatcher view = req.getRequestDispatcher(LOGIN_PAGE);
             PrintWriter out = resp.getWriter();
             out.println("<font color=red>User name or password is wrong.</font>");
