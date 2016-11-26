@@ -65,7 +65,7 @@
     	<tr>
     	    <td>Task context</td>
     	    <td>
-    	        <textarea name="textarea1" rows="5" cols="27"><c:out value="${workTask.taskContext}"/> </textarea>
+    	        <textarea name="textarea1" rows="5" cols="27"><c:out value="${workTask.taskContext}"/></textarea>
     	    </td>
         </tr>
         <tr>
@@ -123,5 +123,63 @@
         </tbody>
     </table>
     <p><a href = "WorkTaskController?action=insert_attach&worktask_id=<c:out value = "${workTask.id}"/>">Insert attach</a></p>
+    <br><br>
+
+    	<form method="POST" action="WorkTaskController" name="frmAddWorkNote">
+    	<table border=0>
+    	<tr>
+    	        <td>Note id : </td>
+    		    <td><input type="text" readonly="readonly" name="worknote_id" value="<c:out value="${worknote.id}"/>"/></td>
+    	</tr>
+    	<tr>
+        		<td><input type="hidden" readonly="readonly" name="worktask_id" value="<c:out value="${workTask.id}"/>"/></td>
+        </tr>
+    	<tr>
+    		<td>Caption : </td>
+    		<td>
+    		    <input type = "text" name = "worknote_caption" value = "<c:out value="${worknote.caption}" />" /><br>
+    		</td>
+    	</tr>
+    	<tr>
+    		<td>Comment : </td>
+    		<td>
+    		    <textarea name="textarea2" rows="5" cols="27"><c:out value="${worknote.description}"/></textarea>
+    		</td>
+    	</tr>
+    	<tr>
+    	    <td></td>
+    	    <td><input type = "submit" value = "Save comment" name = "button"/></td>
+    	</tr>
+    	</table>
+    	</form>
+
+        <br>
+        Notes:
+        <table border=1>
+            <thead>
+                <tr>
+                    <th>Id </th>
+                    <th>Caption </th>
+                    <th>Date </th>
+                    <th>User </th>
+                    <th colspan=2>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach items="${notes}" var = "note">
+            	<tr>
+            	    <td>${note.id}</td>
+            		<td>
+            		<a href = "WorkTaskController?action=open_comment&note_id=<c:out value = "${note.id}"/>&worktask_id=<c:out value = "${workTask.id}"/>&user_id=<c:out value = "${taskuser.id}"/>">${note.caption}</a>
+            		</td>
+            		<td>${note.noteDate}</td>
+            		<td>${note.noteUser}</td>
+            		<td>
+            		<a href = "WorkTaskController?action=delete_comment&note_id=<c:out value = "${note.id}"/>&worktask_id=<c:out value = "${workTask.id}"/>&user_id=<c:out value = "${taskuser.id}"/>">Delete</a>
+                    </td>
+                </tr>
+            	</c:forEach>
+            </tbody>
+        </table>
 </body>
 </html>

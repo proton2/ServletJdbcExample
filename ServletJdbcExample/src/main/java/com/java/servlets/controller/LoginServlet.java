@@ -54,6 +54,7 @@ public class LoginServlet extends HttpServlet {
         if (role!=null) {
             HttpSession session = req.getSession();
             session.setAttribute("user", login);
+            session.setAttribute("user_id", dao.getUserId(login, password));
             session.setAttribute("role", role);
             session.setMaxInactiveInterval(30 * 60);
             LOGGER.info(String.format("Login successfull: login = %s, role: %s", login, session.getAttribute("role")));

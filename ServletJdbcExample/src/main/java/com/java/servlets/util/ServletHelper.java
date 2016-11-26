@@ -6,6 +6,7 @@ import com.java.servlets.model.Attach;
 import com.java.servlets.model.TaskStatus;
 import com.java.servlets.model.User;
 import com.java.servlets.model.UserRole;
+import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,17 +44,21 @@ public class ServletHelper {
 
         wt.setCaption(request.getParameter("caption"));
         wt.setTaskContext(request.getParameter("textarea1"));
-        wt.setTaskStatus(TaskStatus.values()[Integer.parseInt(request.getParameter("taskstatus"))]);
+        wt.setTaskStatus(request.getParameter("taskstatus") == null ?
+                null:
+                TaskStatus.values()[Integer.parseInt(request.getParameter("taskstatus"))]);
 
         try {
-            Date taskdate = new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("taskDate"));
+            Date taskdate = request.getParameter("taskDate") == null ? null :
+                    new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("taskDate"));
             wt.setTaskDate(taskdate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         try {
-            Date deadline = new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("deadLine"));
+            Date deadline = request.getParameter("deadLine") == null ? null :
+                    new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("deadLine"));
             wt.setDeadLine(deadline);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -78,6 +83,39 @@ public class ServletHelper {
         }
 
         return user;
+    }
+
+    public WorkNote getWorkNoteFromRequest(HttpServletRequest request) {
+        WorkNote wn = new WorkNote();
+
+        String id = request.getParameter("worknote_id");
+        if (id != null && !id.isEmpty()) {
+            wn.setId(Long.parseLong(id));
+        }
+
+        Date noteDate = null;
+        try {
+            noteDate = request.getParameter("noteDate") == null ? new Date() :
+                    new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("noteDate"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        wn.setNoteDate(noteDate);
+
+        Long userId = (Long) request.getSession().getAttribute("user_id");//Long.parseLong((String) request.getSession().getAttribute("user_id"));
+        User user = new User();
+        user.setId(userId);
+        wn.setNoteUser(user);
+
+        Long workTaskId = Long.parseLong(request.getParameter("worktask_id"));
+        WorkTask wt = new WorkTask();
+        wt.setId(workTaskId);
+        wn.setSubject(wt);
+
+        wn.setCaption(request.getParameter("worknote_caption"));
+        wn.setDescription(request.getParameter("textarea2"));
+
+        return wn;
     }
 
     public Attach getAttachFromRequest(HttpServletRequest request) throws IOException, ServletException {

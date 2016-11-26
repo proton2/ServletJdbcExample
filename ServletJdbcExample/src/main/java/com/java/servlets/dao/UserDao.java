@@ -14,7 +14,7 @@ import java.util.List;
 class UserDao implements ModelDao<User> {
     private String insertSql = "insert into usertable(firstname, lastname, caption, email, login, password, role_id) values (?, ?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from usertable where id = ?";
-    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role=? where id=?";
+    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role_id=? where id=?";
     private String getUserSql = "select * from usertable where id = ?";
 
     private Connection connection;

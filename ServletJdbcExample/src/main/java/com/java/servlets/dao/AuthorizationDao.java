@@ -13,6 +13,7 @@ import java.sql.SQLException;
  */
 public class AuthorizationDao {
     private String checkUserSql = "select login, password, role_id from usertable where login = ?";
+    private String getUserIdSql = "select id from usertable where login = ? and password=?";
     private Connection connection;
 
     public AuthorizationDao() {
@@ -36,5 +37,21 @@ public class AuthorizationDao {
         }
 
         return null;
+    }
+
+    public Long getUserId(String login, String password) {
+        Long id = -1l;
+        try {
+            PreparedStatement ps = connection.prepareStatement(getUserIdSql);
+            ps.setString(1, login);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 }

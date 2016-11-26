@@ -43,7 +43,24 @@ create table if not exists public.attach (
 	CONSTRAINT attachpk PRIMARY KEY (id),
 	CONSTRAINT fk_worktask_id FOREIGN KEY (worktask_id)
 	REFERENCES public.worktask (id) MATCH SIMPLE
-	ON UPDATE NO ACTION ON DELETE NO ACTION
+	    ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+create table if not exists public.WorkNote (
+	id bigint not null default nextval('hibernate_sequence'::regclass),
+	caption varchar(255),
+	noteDate timestamp without time zone,
+	description varchar(512),
+	model_id bigint,
+	user_id bigint,
+	CONSTRAINT worknotepk PRIMARY KEY (id),
+	CONSTRAINT fk_model_id FOREIGN KEY (model_id)
+	REFERENCES public.worktask (id) MATCH SIMPLE
+    	ON UPDATE NO ACTION ON DELETE NO ACTION,
+
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id)
+    REFERENCES public.usertable (id) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values

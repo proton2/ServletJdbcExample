@@ -4,6 +4,7 @@ import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.Attach;
 import com.java.servlets.model.User;
 import com.java.servlets.model.UserView;
+import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.model.WorkTaskView;
 import com.java.servlets.util.ServletHelper;
@@ -26,6 +27,7 @@ public class WorkTaskController extends HttpServlet {
     private static String SELECT_USER = "/selectUser.jsp";
     private static String INSERT_OR_EDIT_ATTACH = "/attach.jsp";
     private static String EDIT_WORKTASK = "/WorkTaskController?action=edit&id=";
+    private static String EDIT_WORKTASK_REDIRECT = "/ServletJdbcExample/WorkTaskController?action=edit&id=";
     private static String DOWNLOAD = "/download?downloadfile=";
 
     private ServletHelper helper;
@@ -51,6 +53,7 @@ public class WorkTaskController extends HttpServlet {
             request.setAttribute("taskuser", workTask.getTaskUser());
             request.setAttribute("workTask", workTask);
             request.setAttribute("attaches", DaoFactory.getListById(workTask.getId(), Attach.class));
+            request.setAttribute("notes", DaoFactory.getListById(workTask.getId(), WorkNote.class));
         } else if (action.equalsIgnoreCase("select_user")) {
             Long userId = Long.parseLong(request.getParameter("id"));
             User user = (User) DaoFactory.getById(userId, User.class);
@@ -64,11 +67,10 @@ public class WorkTaskController extends HttpServlet {
             String delfile = request.getParameter("att_filename");
             helper.deleteAttach(uploadFilePath + delfile);
             forward = EDIT_WORKTASK + request.getParameter("worktask_id");
-        }else if (action.equalsIgnoreCase("download_attach")) {
+        } else if (action.equalsIgnoreCase("download_attach")) {
             String file = request.getParameter("att_filename");
             forward = DOWNLOAD + file;
-        }
-        else if (action.equalsIgnoreCase("edit_attach")) {
+        } else if (action.equalsIgnoreCase("edit_attach")) {
             Long wt_id = Long.parseLong(request.getParameter("worktask_id"));
             request.setAttribute("wt_id", wt_id);
             Long attachId = Long.parseLong(request.getParameter("attach_id"));
@@ -81,10 +83,20 @@ public class WorkTaskController extends HttpServlet {
                 request.setAttribute("wt_id", wt_id);
                 forward = INSERT_OR_EDIT_ATTACH;
             }
-        }
-        else if (action.equalsIgnoreCase("list")) {
+        } else if (action.equalsIgnoreCase("list")) {
             forward = LIST_ITEMS;
             request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
+        } else if (action.equalsIgnoreCase("open_comment")) {
+            Long noteId = Long.parseLong(request.getParameter("note_id"));
+            WorkNote note = (WorkNote) DaoFactory.getById(noteId, WorkNote.class);
+            Long workTaskId = Long.parseLong(request.getParameter("worktask_id"));
+            request.setAttribute("worknote", note);
+            forward = EDIT_WORKTASK + workTaskId;
+        }else if (action.equalsIgnoreCase("delete_comment")) {
+            Long noteId = Long.parseLong(request.getParameter("note_id"));
+            DaoFactory.delete(noteId, WorkNote.class);
+            Long workTaskId = Long.parseLong(request.getParameter("worktask_id"));
+            forward = EDIT_WORKTASK + workTaskId;
         } else {
             forward = INSERT_OR_EDIT;
         }
@@ -95,25 +107,36 @@ public class WorkTaskController extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String buttonPressed = request.getParameter("button");
-        WorkTask wt = helper.getWorkTaskFromRequest(request);
 
         if (buttonPressed.equalsIgnoreCase("Save")) {
+            WorkTask wt = helper.getWorkTaskFromRequest(request);
             if (wt.getId() == null) {
                 DaoFactory.insert(wt);
             } else {
                 DaoFactory.update(wt);
             }
             request.getSession().removeAttribute("workTask");
-
             forward = LIST_ITEMS;
             request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
+            RequestDispatcher view = request.getRequestDispatcher(forward);
+            view.forward(request, response);
         } else if (buttonPressed.equalsIgnoreCase("Set user")) {
+            WorkTask wt = helper.getWorkTaskFromRequest(request);
             request.getSession().setAttribute("workTask", wt);
             request.setAttribute("users", DaoFactory.getAll(UserView.class));
             forward = SELECT_USER;
+            RequestDispatcher view = request.getRequestDispatcher(forward);
+            view.forward(request, response);
+        } else if (buttonPressed.equalsIgnoreCase("Save comment")) {
+            WorkNote wn = helper.getWorkNoteFromRequest(request);
+            if (!wn.getDescription().isEmpty() && !wn.getCaption().isEmpty()) {
+                if (wn.getId() == null) {
+                    DaoFactory.insert(wn);
+                } else {
+                    DaoFactory.update(wn);
+                }
+            }
+            response.sendRedirect(EDIT_WORKTASK_REDIRECT + wn.getSubject().getId());
         }
-
-        RequestDispatcher view = request.getRequestDispatcher(forward);
-        view.forward(request, response);
     }
 }

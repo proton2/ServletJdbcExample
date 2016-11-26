@@ -20,6 +20,7 @@ public class DaoFactory {
             creators.put(WorkTaskView.class, new WorkTaskViewDao());
             creators.put(UserView.class, new UserViewDao());
             creators.put(Attach.class, new AttachDao());
+            creators.put(WorkNote.class, new WorkNoteDao());
         }
 
         ModelDao<?> creator = creators.get(dtoClass);

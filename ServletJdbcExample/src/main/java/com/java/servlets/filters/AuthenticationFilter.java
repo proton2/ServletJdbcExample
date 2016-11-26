@@ -22,7 +22,7 @@ public class AuthenticationFilter implements Filter{
 
         String uri = req.getRequestURI();
         HttpSession session = req.getSession(false);
-        if(session == null && !(uri.endsWith("jsp") || uri.endsWith("LoginServlet"))){
+        if((session == null || session.getAttribute("role") == null) && !(uri.endsWith("jsp") || uri.endsWith("LoginServlet"))){
             RequestDispatcher view = request.getRequestDispatcher(LOGIN_PAGE);
             view.forward(request, response);
         }else{
