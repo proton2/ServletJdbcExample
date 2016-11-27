@@ -104,3 +104,10 @@ insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser
 ('attach loading', '04.09.2016', '07.09.2016', 'Create attach loading class', (select id from usertable where usertable.email='gr-1@mycomp.ru'), 2);
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
 ('Regress test', '06.09.2016', '07.09.2016', 'perform regress test', (select id from usertable where usertable.email='test1@mycomp.ru'), 2);
+
+insert into public.worknote(caption, notedate, description, model_id, user_id) values
+('my comment', '2016-11-26', 'note about this task', (select id from worktask wt where wt.caption = 'attach loading' and wt.taskcontext = 'Create attach loading class'), (select id from usertable where email = 'admin@mycomp.ru'));
+insert into public.worknote(caption, notedate, description, model_id, user_id) values
+('about dead line', '2016-11-27', 'thinking about something', (select id from worktask wt where wt.caption = 'attach loading' and wt.taskcontext = 'Create attach loading class'), (select id from usertable where email = 'admin@mycomp.ru'));
+insert into public.worknote(caption, notedate, description, model_id, user_id) values
+('task revision', '2016-11-27', 'some text about this task', (select id from worktask wt where wt.caption = 'attach loading' and wt.taskcontext = 'Create attach loading class'), (select id from usertable where email = 'lead@mycomp.ru'));
