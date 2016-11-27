@@ -4,17 +4,23 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-	
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
- 	<link rel="stylesheet" href="/resources/demos/style.css">
-	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
-
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Add new user</title>
-</head>
+	
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ 	<link rel="stylesheet" href="/resources/demos/style.css">
 
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+      $( function() {
+        $( "#tabs" ).tabs();
+      } );
+    </script>
+</head>
 <body>
+
 <jsp:include page="master.jsp"></jsp:include>
 <br>
 
@@ -88,7 +94,16 @@
     </form>
 
     <br>
-    Attaches:
+
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-2">Notes</a></li>
+        <li><a href="#tabs-1">Attaches</a></li>
+      </ul>
+
+      <div id="tabs-1">
+
+
     <table border=1>
         <thead>
             <tr>
@@ -124,6 +139,9 @@
     </table>
     <p><a href = "WorkTaskController?action=insert_attach&worktask_id=<c:out value = "${workTask.id}"/>">Insert attach</a></p>
     <br><br>
+    </div>
+
+    <div id="tabs-2">
 
     	<form method="POST" action="WorkTaskController" name="frmAddWorkNote">
     	<table border=0>
@@ -154,7 +172,6 @@
     	</form>
 
         <br>
-        Notes:
         <table border=1>
             <thead>
                 <tr>
@@ -181,5 +198,7 @@
             	</c:forEach>
             </tbody>
         </table>
+        </div>
+        </div>
 </body>
 </html>
