@@ -57,8 +57,11 @@ public class WorkTaskController extends HttpServlet {
         } else if (action.equalsIgnoreCase("select_user")) {
             Long userId = Long.parseLong(request.getParameter("id"));
             User user = (User) DaoFactory.getById(userId, User.class);
-            request.setAttribute("workTask", request.getSession().getAttribute("workTask"));
+            WorkTask wt = (WorkTask) request.getSession().getAttribute("workTask");
+            request.setAttribute("workTask", wt);
             request.setAttribute("taskuser", user);
+            request.setAttribute("attaches", DaoFactory.getListById(wt.getId(), Attach.class));
+            request.setAttribute("notes", DaoFactory.getListById(wt.getId(), WorkNote.class));
             forward = INSERT_OR_EDIT;
         } else if (action.equalsIgnoreCase("delete_attach")) {
             Long attachId = Long.parseLong(request.getParameter("attach_id"));
