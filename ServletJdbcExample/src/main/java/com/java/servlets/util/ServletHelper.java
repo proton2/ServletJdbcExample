@@ -1,6 +1,7 @@
 package com.java.servlets.util;
 
 import com.java.servlets.controller.LoginServlet;
+import com.java.servlets.dao.AuthorizationDao;
 import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.Attach;
 import com.java.servlets.model.TaskStatus;
@@ -8,6 +9,11 @@ import com.java.servlets.model.User;
 import com.java.servlets.model.UserRole;
 import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +22,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Created by proton2 on 09.10.2016.
@@ -45,7 +55,7 @@ public class ServletHelper {
         wt.setCaption(request.getParameter("caption"));
         wt.setTaskContext(request.getParameter("textarea1"));
         wt.setTaskStatus(request.getParameter("taskstatus") == null ?
-                null:
+                null :
                 TaskStatus.values()[Integer.parseInt(request.getParameter("taskstatus"))]);
 
         try {
@@ -118,6 +128,74 @@ public class ServletHelper {
         return wn;
     }
 
+    public Collection<WorkTask> importWorkTasks(HttpServletRequest request) throws IOException, ServletException {
+        Part filePart = request.getPart("excelFile");
+        String partFile = getFileName1(filePart);
+        if (partFile.isEmpty()) {
+            return null;
+        }
+        InputStream inputStream = filePart.getInputStream();
+
+        String fileExt = getFileExt(partFile);
+        Workbook wb = null;
+        if (fileExt.equalsIgnoreCase("xls")) {
+            wb = new HSSFWorkbook(inputStream);
+        } else if (fileExt.equalsIgnoreCase("xlsx")) {
+            wb = new XSSFWorkbook(inputStream);
+        } else {
+            return null;
+        }
+
+        Sheet sheet = wb.getSheetAt(0);
+        Iterator<Row> it = sheet.iterator();
+        if (it.hasNext()) {
+            it.next();
+        } else {
+            return null;
+        }
+        ArrayList<WorkTask> workTaskList = new ArrayList<>(sheet.getPhysicalNumberOfRows() - 1);
+        AuthorizationDao dao = new AuthorizationDao();
+
+        while (it.hasNext()) {
+            Row row = it.next();
+            WorkTask workTask = new WorkTask();
+            workTask.setCaption(row.getCell(1).getStringCellValue());
+            workTask.setTaskContext(row.getCell(2).getStringCellValue());
+            try {
+                workTask.setTaskDate(row.getCell(3).getDateCellValue());
+            } catch (Exception e) {
+                continue;
+            }
+            try {
+                workTask.setDeadLine(row.getCell(4).getDateCellValue());
+            } catch (Exception e) {
+                continue;
+            }
+
+            Long userId = dao.getUserId(row.getCell(5).getStringCellValue());
+            if (userId == -1) {
+                continue;
+            }
+            User user = new User();
+            user.setId(userId);
+            workTask.setTaskUser(user);
+
+            String taskStatus = row.getCell(6).getStringCellValue();
+            if (taskStatus.equalsIgnoreCase("new")) {
+                workTask.setTaskStatus(TaskStatus.NEW);
+            } else if (taskStatus.equalsIgnoreCase("actual")) {
+                workTask.setTaskStatus(TaskStatus.ACTUAL);
+            } else if (taskStatus.equalsIgnoreCase("closed")) {
+                workTask.setTaskStatus(TaskStatus.CLOSED);
+            } else {
+                continue;
+            }
+            workTaskList.add(workTask);
+        }
+
+        return workTaskList;
+    }
+
     public Attach getAttachFromRequest(HttpServletRequest request) throws IOException, ServletException {
         Attach attach = new Attach();
 
@@ -128,7 +206,7 @@ public class ServletHelper {
         }
         Part filePart = request.getPart("attachFile");
         String partFile = getFileName1(filePart);
-        String fname = partFile.isEmpty()?
+        String fname = partFile.isEmpty() ?
                 request.getParameter("fName") :
                 partFile.substring(partFile.lastIndexOf("\\") + 1);
 
@@ -138,7 +216,7 @@ public class ServletHelper {
         File f = new File(uploadFilePath + fname);
         if (!f.exists()) {
             filePart.write(uploadFilePath + fname);
-            if (!partFile.isEmpty() && !request.getParameter("fName").isEmpty()){
+            if (!partFile.isEmpty() && !request.getParameter("fName").isEmpty()) {
                 deleteAttach(uploadFilePath + request.getParameter("fName"));
                 LOGGER.info(request.getParameter("fName") + " is overrided!");
             }
@@ -154,6 +232,15 @@ public class ServletHelper {
             attach.setId(Long.parseLong(id));
         }
         return attach;
+    }
+
+    public String getFileExt(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i+1);
+        }
+        return extension;
     }
 
     public String getFileName(Part part) {

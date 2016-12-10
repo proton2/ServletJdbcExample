@@ -1,6 +1,7 @@
 package com.java.servlets.controller;
 
 import com.java.servlets.dao.DaoFactory;
+import com.java.servlets.dao.WorkTaskDao;
 import com.java.servlets.model.Attach;
 import com.java.servlets.model.User;
 import com.java.servlets.model.UserView;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Created by proton2 on 06.08.2016.
@@ -45,7 +47,7 @@ public class WorkTaskController extends HttpServlet {
             Long userId = Long.parseLong(request.getParameter("id"));
             DaoFactory.delete(userId, WorkTask.class);
             forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getAll(WorkTask.class));
+            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
         } else if (action.equalsIgnoreCase("edit")) {
             forward = INSERT_OR_EDIT;
             Long workTaskId = Long.parseLong(request.getParameter("id"));
@@ -140,6 +142,16 @@ public class WorkTaskController extends HttpServlet {
                 }
             }
             response.sendRedirect(EDIT_WORKTASK_REDIRECT + wn.getSubject().getId());
+        } else if (buttonPressed.equalsIgnoreCase("Import")) {
+            Collection<WorkTask> workTaskList = helper.importWorkTasks(request);
+            if (workTaskList!=null && !workTaskList.isEmpty()) {
+                WorkTaskDao workTaskDao = new WorkTaskDao();
+                workTaskDao.importCollection(workTaskList);
+            }
+            forward = LIST_ITEMS;
+            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
+            RequestDispatcher view = request.getRequestDispatcher(forward);
+            view.forward(request, response);
         }
     }
 }

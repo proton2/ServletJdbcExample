@@ -41,6 +41,12 @@
     	</table>
 
     <p><a href = "WorkTaskController?action=">Add workTask</a></p>
+
+    <form name="frmImportWorkNote" method="POST" action="WorkTaskController" enctype="multipart/form-data">
+    <input type="file" name="excelFile"/>
+    <input type = "submit" value = "Import" name = "button"/>
+    </form>
+
 </body>
 
 </html>

@@ -9,7 +9,13 @@ import com.java.servlets.util.EHCacheManger;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
-import java.sql.*;
+import java.sql.BatchUpdateException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,6 +65,35 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
         cache.put(new Element(insertId, item));
 
         return insertId;
+    }
+
+    public int importCollection(Collection<WorkTask> workTaskList){
+        int[] updateCounts = null;
+        if (workTaskList!=null && !workTaskList.isEmpty()) {
+
+            try {
+                PreparedStatement ps = connection.prepareStatement(insertSql);
+
+                for (WorkTask workTask : workTaskList) {
+                    ps.setLong(1, workTask.getTaskUser().getId());
+                    ps.setString(2, workTask.getCaption());
+                    ps.setString(3, workTask.getTaskContext());
+                    ps.setDate(4, new java.sql.Date(workTask.getTaskDate().getTime()));
+                    ps.setDate(5, new java.sql.Date(workTask.getDeadLine().getTime()));
+                    ps.setInt(6, workTask.getTaskStatus().ordinal());
+
+                    ps.addBatch();
+                }
+
+                updateCounts = ps.executeBatch();
+
+            } catch (BatchUpdateException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return updateCounts == null ? null : updateCounts.length;
     }
 
     @Override
