@@ -9,7 +9,6 @@ import com.java.servlets.util.EHCacheManger;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
-import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -72,8 +71,9 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
         if (workTaskList!=null && !workTaskList.isEmpty()) {
 
             try {
-                PreparedStatement ps = connection.prepareStatement(insertSql);
+                connection.setAutoCommit(false);
 
+                PreparedStatement ps = connection.prepareStatement(insertSql);
                 for (WorkTask workTask : workTaskList) {
                     ps.setLong(1, workTask.getTaskUser().getId());
                     ps.setString(2, workTask.getCaption());
@@ -84,12 +84,15 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
 
                     ps.addBatch();
                 }
-
                 updateCounts = ps.executeBatch();
 
-            } catch (BatchUpdateException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
+                connection.commit();
+            }  catch (SQLException e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
                 e.printStackTrace();
             }
         }
