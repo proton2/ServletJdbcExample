@@ -46,8 +46,12 @@ public class DaoFactory {
         getDao(item.getClass()).update(item);
     }
 
-    public static List<? extends Model> getAll(Class<? extends Model> dtoClass) {
-        return getDao(dtoClass).getAll();
+    public static List<? extends Model> getAll(Class<? extends Model> dtoClass, int offcet, int limit) {
+        return getDao(dtoClass).getAll(offcet, limit);
+    }
+
+    public static int getNumOfRecoeds(Class<? extends Model> dtoClass){
+        return getDao(dtoClass).getNumOfRecoeds();
     }
 
     public static List<? extends Model> getListById(Long id, Class<? extends Model> dtoClass) {

@@ -14,22 +14,26 @@ import java.util.List;
 public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
     private String getAllSql = "select w.id, w.caption, w.taskDate, w.deadLine, w.taskstatus_id, u.firstName, u.lastName\n" +
             "from WorkTask w\n" +
-            "join usertable u on w.taskuser_id = u.id\n";
+            "join usertable u on w.taskuser_id = u.id\n" +
+            "offset ? limit ?";
     private String getUserWorkTasks = "select id, caption, taskDate, deadLine, taskstatus_id\n" +
             "from WorkTask where taskuser_id = ?";
 
     private Connection connection;
+    private int numOfRdcords;
 
     public WorkTaskViewDao() {
         connection = DbUtil.getConnection();
     }
 
     @Override
-    public List<WorkTaskView> getAll() {
+    public List<WorkTaskView> getAll(int offset, int limit) {
         List<WorkTaskView> workTasks = new ArrayList<>();
         try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery(getAllSql);
+            PreparedStatement ps = connection.prepareStatement(getAllSql);
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 WorkTaskView workTask = new WorkTaskView();
@@ -44,6 +48,10 @@ public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
 
                 workTasks.add(workTask);
             }
+
+            ps = connection.prepareStatement("select count(*) from worktask");
+            rs = ps.executeQuery();
+            if (rs.next()) {this.numOfRdcords = rs.getInt(1);}
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -95,5 +103,10 @@ public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
     @Override
     public WorkTaskView getById(Long itemId) {
         return null;
+    }
+
+    @Override
+    public int getNumOfRecoeds() {
+        return numOfRdcords;
     }
 }

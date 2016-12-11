@@ -14,9 +14,11 @@ public interface ModelDao<T extends Model> {
 
     void delete(Long id);
 
-    List<T> getAll();
+    List<T> getAll(int offcet, int limit);
 
     List<T> getListById(Long itemId);
 
     T getById(Long itemId);
+
+    int getNumOfRecoeds();
 }

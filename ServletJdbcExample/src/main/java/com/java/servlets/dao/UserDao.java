@@ -127,12 +127,17 @@ class UserDao implements ModelDao<User> {
     }
 
     @Override
+    public int getNumOfRecoeds() {
+        return 0;
+    }
+
+    @Override
     public List<User> getListById(Long itemId) {
         return null;
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAll(int offcet, int limit) {
         return null;
     }
 }

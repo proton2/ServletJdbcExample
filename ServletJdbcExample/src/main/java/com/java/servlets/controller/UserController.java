@@ -33,7 +33,7 @@ public class UserController extends HttpServlet{
     		Long userId = Long.parseLong(request.getParameter("id"));
     		DaoFactory.delete(userId, User.class);
     		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getAll(User.class));
+    		request.setAttribute("users", DaoFactory.getAll(User.class, 0, 0));
     	}
     	else if (action.equalsIgnoreCase("edit")){
     		forward = INSERT_OR_EDIT;
@@ -48,7 +48,7 @@ public class UserController extends HttpServlet{
 		}
 		else if (action.equalsIgnoreCase("list")){
     		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getAll(UserView.class));
+    		request.setAttribute("users", DaoFactory.getAll(UserView.class, 0, 0));
     	} else {
     		forward = INSERT_OR_EDIT;
     	}
@@ -67,7 +67,7 @@ public class UserController extends HttpServlet{
 			DaoFactory.update(user1);
     	}
     	RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
-    	request.setAttribute("users", DaoFactory.getAll(UserView.class));
+    	request.setAttribute("users", DaoFactory.getAll(UserView.class, 0, 0));
     	view.forward(request, response);
     }
 }

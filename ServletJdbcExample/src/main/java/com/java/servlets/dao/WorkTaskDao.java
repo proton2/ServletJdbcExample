@@ -174,12 +174,17 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     @Override
+    public int getNumOfRecoeds() {
+        return 0;
+    }
+
+    @Override
     public List<WorkTask> getListById(Long itemId) {
         return null;
     }
 
     @Override
-    public List<WorkTask> getAll() {
+    public List<WorkTask> getAll(int offcet, int limit) {
         return null;
     }
 }

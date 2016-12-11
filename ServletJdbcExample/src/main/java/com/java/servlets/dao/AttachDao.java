@@ -80,7 +80,7 @@ public class AttachDao implements ModelDao<Attach>{
     }
 
     @Override
-    public List<Attach> getAll() {
+    public List<Attach> getAll(int offcet, int limit) {
         return null;
     }
 
@@ -125,5 +125,10 @@ public class AttachDao implements ModelDao<Attach>{
         }
 
         return attach;
+    }
+
+    @Override
+    public int getNumOfRecoeds() {
+        return 0;
     }
 }

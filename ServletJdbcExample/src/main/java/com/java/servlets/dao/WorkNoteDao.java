@@ -106,7 +106,7 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
     }
 
     @Override
-    public List<WorkNote> getAll() {
+    public List<WorkNote> getAll(int offcet, int limit) {
         return null;
     }
 
@@ -148,6 +148,11 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
 
         cache.put(new Element(itemId, wn));
         return wn;
+    }
+
+    @Override
+    public int getNumOfRecoeds() {
+        return 0;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class UserViewDao implements ModelDao<UserView> {
     }
 
     @Override
-    public List<UserView> getAll() {
+    public List<UserView> getAll(int offcet, int limit) {
         List<UserView> users = new ArrayList<>();
         try {
             Statement st = connection.createStatement();
@@ -64,5 +64,10 @@ public class UserViewDao implements ModelDao<UserView> {
     @Override
     public UserView getById(Long userId) {
         return null;
+    }
+
+    @Override
+    public int getNumOfRecoeds() {
+        return 0;
     }
 }

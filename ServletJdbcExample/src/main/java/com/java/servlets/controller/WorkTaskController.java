@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by proton2 on 06.08.2016.
@@ -31,9 +32,13 @@ public class WorkTaskController extends HttpServlet {
     private static String EDIT_WORKTASK = "/WorkTaskController?action=edit&id=";
     private static String EDIT_WORKTASK_REDIRECT = "/ServletJdbcExample/WorkTaskController?action=edit&id=";
     private static String DOWNLOAD = "/download?downloadfile=";
+    private static String LIST_WORKTASK_REDIRECT = "/ServletJdbcExample/WorkTaskController?action=list";
+    private static String LIST_WORKTASK_FORWARD = "/WorkTaskController?action=list";
 
     private ServletHelper helper;
     private String forward = "";
+    private int page = 1;
+    private int recordsPerPage = 5;
 
     public WorkTaskController() {
         super();
@@ -46,8 +51,7 @@ public class WorkTaskController extends HttpServlet {
         if (action.equalsIgnoreCase("delete")) {
             Long userId = Long.parseLong(request.getParameter("id"));
             DaoFactory.delete(userId, WorkTask.class);
-            forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
+            forward = LIST_WORKTASK_FORWARD;
         } else if (action.equalsIgnoreCase("edit")) {
             forward = INSERT_OR_EDIT;
             Long workTaskId = Long.parseLong(request.getParameter("id"));
@@ -90,7 +94,15 @@ public class WorkTaskController extends HttpServlet {
             }
         } else if (action.equalsIgnoreCase("list")) {
             forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
+            if(request.getParameter("page") != null)
+                page = Integer.parseInt(request.getParameter("page"));
+            List<WorkTaskView> items =
+                    (List<WorkTaskView>) DaoFactory.getAll(WorkTaskView.class, (page-1)*recordsPerPage, recordsPerPage);
+            int numOfRecords = DaoFactory.getNumOfRecoeds(WorkTaskView.class);
+            int noOfPages = (int) Math.ceil(numOfRecords * 1.0 / recordsPerPage);
+            request.setAttribute("workTasks", items);
+            request.setAttribute("noOfPages", noOfPages);
+            request.setAttribute("currentPage", page);
         } else if (action.equalsIgnoreCase("open_comment")) {
             Long noteId = Long.parseLong(request.getParameter("note_id"));
             WorkNote note = (WorkNote) DaoFactory.getById(noteId, WorkNote.class);
@@ -122,13 +134,13 @@ public class WorkTaskController extends HttpServlet {
             }
             request.getSession().removeAttribute("workTask");
             forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
+            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class, 0, 0));
             RequestDispatcher view = request.getRequestDispatcher(forward);
             view.forward(request, response);
         } else if (buttonPressed.equalsIgnoreCase("Set user")) {
             WorkTask wt = helper.getWorkTaskFromRequest(request);
             request.getSession().setAttribute("workTask", wt);
-            request.setAttribute("users", DaoFactory.getAll(UserView.class));
+            request.setAttribute("users", DaoFactory.getAll(UserView.class, 0, 0));
             forward = SELECT_USER;
             RequestDispatcher view = request.getRequestDispatcher(forward);
             view.forward(request, response);
@@ -148,10 +160,7 @@ public class WorkTaskController extends HttpServlet {
                 WorkTaskDao workTaskDao = new WorkTaskDao();
                 workTaskDao.importCollection(workTaskList);
             }
-            forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class));
-            RequestDispatcher view = request.getRequestDispatcher(forward);
-            view.forward(request, response);
+            response.sendRedirect(LIST_WORKTASK_REDIRECT);
         }
     }
 }
