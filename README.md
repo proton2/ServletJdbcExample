@@ -19,3 +19,5 @@ Small Web application - work tasks and deadlines. Like a little Jira.
 - Logging into separatly log files;
 
 proton2@mail.ru
+
+![List worktasks](https://github.com/proton2/ServletJdbcExample/tree/master/ServletJdbcExample/img/sje-01.jpg)
