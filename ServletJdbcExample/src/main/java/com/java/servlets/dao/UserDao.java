@@ -5,6 +5,7 @@ import com.java.servlets.model.User;
 import com.java.servlets.model.UserRole;
 import com.java.servlets.util.DbUtil;
 import com.java.servlets.util.EHCacheManger;
+import com.java.servlets.util.SqlXmlReader;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
@@ -12,15 +13,23 @@ import java.sql.*;
 import java.util.List;
 
 class UserDao implements ModelDao<User> {
+    /*
     private String insertSql = "insert into usertable(firstname, lastname, caption, email, login, password, role_id) values (?, ?, ?, ?, ?, ?, ?)";
     private String deleteSql = "delete from usertable where id = ?";
     private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role_id=? where id=?";
     private String getUserSql = "select * from usertable where id = ?";
+    */
 
     private Connection connection;
+    String insertSql, deleteSql, updateSql, getUserSql;
 
     UserDao() {
         connection = DbUtil.getConnection();
+        SqlXmlReader sl = new SqlXmlReader();
+        insertSql = sl.getQuerry("UserDao", "insertSql");
+        deleteSql = sl.getQuerry("UserDao", "deleteSql");
+        updateSql = sl.getQuerry("UserDao", "updateSql");
+        getUserSql = sl.getQuerry("UserDao", "getUserSql");
     }
 
     @Override

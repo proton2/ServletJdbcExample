@@ -17,6 +17,7 @@ public class UserController extends HttpServlet{
 	private static final long serialVersionUID = 1L;
     private static String INSERT_OR_EDIT = "/user.jsp";
     private static String LIST_USER = "/listUser.jsp";
+	private static String LIST_USER2 = "UserController?action=list";
 
 	private ServletHelper helper;
 
@@ -32,8 +33,7 @@ public class UserController extends HttpServlet{
     	if (action.equalsIgnoreCase("delete")){
     		Long userId = Long.parseLong(request.getParameter("id"));
     		DaoFactory.delete(userId, User.class);
-    		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getAll(User.class, 0, 0));
+    		forward = LIST_USER2;
     	}
     	else if (action.equalsIgnoreCase("edit")){
     		forward = INSERT_OR_EDIT;

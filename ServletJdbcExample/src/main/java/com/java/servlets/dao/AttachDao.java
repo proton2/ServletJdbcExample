@@ -4,6 +4,7 @@ import com.java.servlets.model.Attach;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.SqlXmlReader;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,17 +13,25 @@ import java.util.List;
 /**
  * Created by proton2 on 05.11.2016.
  */
-public class AttachDao implements ModelDao<Attach>{
+public class AttachDao implements ModelDao<Attach> {
+    /*
     private String insertSql = "insert into attach(fileName, caption, worktask_id) values (?, ?, ?)";
     private String deleteSql = "delete from attach where id = ?";
     private String updateSql = "update attach set fileName=?, caption=?, worktask_id=? where id=?";
     private String getByIdSql = "select * from attach where id = ?";
     private String getListById = "select id, filename, caption from attach where worktask_id = ?";
-
+*/
     private Connection connection;
+    String insertSql, deleteSql, updateSql, getByIdSql, getListById;
 
     AttachDao() {
         connection = DbUtil.getConnection();
+        SqlXmlReader sl = new SqlXmlReader();
+        insertSql = sl.getQuerry("AttachDao", "insertSql");
+        deleteSql = sl.getQuerry("AttachDao", "deleteSql");
+        updateSql = sl.getQuerry("AttachDao", "updateSql");
+        getByIdSql = sl.getQuerry("AttachDao", "getByIdSql");
+        getListById = sl.getQuerry("AttachDao", "getListById");
     }
 
     @Override

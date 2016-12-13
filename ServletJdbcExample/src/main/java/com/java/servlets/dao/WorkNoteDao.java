@@ -6,6 +6,7 @@ import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
 import com.java.servlets.util.EHCacheManger;
+import com.java.servlets.util.SqlXmlReader;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by proton2 on 21.11.2016.
  */
 public class WorkNoteDao implements ModelDao<WorkNote>{
-
+/*
     private String insertSql = "insert into WorkNote(caption, noteDate, description, model_id, user_id) values (?, ?, ?, ?, ?)";
     private String deleteSql = "delete from WorkNote where id = ?";
     private String updateSql = "update WorkNote set caption=?, noteDate=?, description=?, model_id=?, user_id=? where id=?";
@@ -34,11 +35,18 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
             "from WorkNote wn\n" +
             "join usertable on usertable.id = wn.user_id\n" +
             "where model_id = ?";
-
+*/
     private Connection connection;
+    String insertSql, deleteSql, updateSql, getByIdSql, getListById;
 
     WorkNoteDao(){
         connection = DbUtil.getConnection();
+        SqlXmlReader sl = new SqlXmlReader();
+        insertSql = sl.getQuerry("WorkNoteDao", "insertSql");
+        deleteSql = sl.getQuerry("WorkNoteDao", "deleteSql");
+        updateSql = sl.getQuerry("WorkNoteDao", "updateSql");
+        getByIdSql = sl.getQuerry("WorkNoteDao", "getByIdSql");
+        getListById = sl.getQuerry("WorkNoteDao", "getListById");
     }
 
     @Override

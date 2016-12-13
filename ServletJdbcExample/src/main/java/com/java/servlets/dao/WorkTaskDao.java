@@ -6,6 +6,7 @@ import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DbUtil;
 import com.java.servlets.util.EHCacheManger;
+import com.java.servlets.util.SqlXmlReader;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
@@ -21,23 +22,31 @@ import java.util.List;
  * Created by proton2 on 06.08.2016.
  */
 public class WorkTaskDao implements ModelDao<WorkTask> {
-    private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)";
-    private String deleteSql = "delete from WorkTask where id = ?";
-    private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?";
+    //private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)";
+    //private String deleteSql = "delete from WorkTask where id = ?";
+    //private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?";
+    /*
     private String getById = "select w.id, w.caption, w.taskContext, w.taskDate, w.deadLine, w.taskstatus_id, w.taskuser_id, u.firstName, u.lastName\n" +
             "from WorkTask w join usertable u on w.taskuser_id = u.id\n" +
-            "where w.id = ?";
+            "where w.id = ?";*/
 
     private Connection connection;
+    String getById, updateSql, deleteSql, insertSql;
 
     public WorkTaskDao() {
         connection = DbUtil.getConnection();
+
+        SqlXmlReader sl = new SqlXmlReader();
+        getById = sl.getQuerry("WorkTaskDao", "getById");
+        updateSql = sl.getQuerry("WorkTaskDao", "updateSql");
+        deleteSql = sl.getQuerry("WorkTaskDao", "deleteSql");
+        insertSql = sl.getQuerry("WorkTaskDao", "insertSql");
     }
 
     @Override
     public Long insert(Model item) {
+        WorkTask wt = (WorkTask) item;
         try {
-            WorkTask wt = (WorkTask) item;
             PreparedStatement ps = connection.prepareStatement(insertSql);
             ps.setLong(1, wt.getTaskUser().getId());
             ps.setString(2, wt.getCaption());
@@ -56,12 +65,13 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             ResultSet result = select.executeQuery("SELECT max(id) FROM WorkTask");
             while (result.next()) {
                 insertId = result.getLong(1);
+                wt.setId(insertId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         Cache cache = EHCacheManger.getCache();
-        cache.put(new Element(insertId, item));
+        cache.put(new Element(insertId, wt));
 
         return insertId;
     }

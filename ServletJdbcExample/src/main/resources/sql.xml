@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<querry>
+
+	<class name="WorkTaskViewDao">
+		<SQL name="getall">
+			<![CDATA[select w.id, w.caption, w.taskDate, w.deadLine, w.taskstatus_id, u.firstName, u.lastName from WorkTask w join usertable u on w.taskuser_id = u.id offset ? limit ?]]>
+		</SQL>
+		<SQL name="getUserWorkTasks">
+			<![CDATA[select id, caption, taskDate, deadLine, taskstatus_id from WorkTask where taskuser_id = ?]]>
+		</SQL>
+	</class>
+
+	<class name="WorkTaskDao">
+		<SQL name="getById">
+			<![CDATA[select w.id, w.caption, w.taskContext, w.taskDate, w.deadLine, w.taskstatus_id, w.taskuser_id, u.firstName, u.lastName
+			from WorkTask w join usertable u on w.taskuser_id = u.id where w.id = ?]]>
+		</SQL>
+		<SQL name="updateSql">
+			<![CDATA[update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?]]>
+		</SQL>
+		<SQL name="deleteSql">
+			<![CDATA[delete from WorkTask where id = ?]]>
+		</SQL>
+		<SQL name="insertSql">
+			<![CDATA[insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)]]>
+		</SQL>
+	</class>
+
+	<class name="AttachDao">
+		<SQL name="insertSql">
+			<![CDATA[insert into attach(fileName, caption, worktask_id) values (?, ?, ?)]]>
+		</SQL>
+		<SQL name="deleteSql">
+			<![CDATA[delete from attach where id = ?]]>
+		</SQL>
+		<SQL name="updateSql">
+			<![CDATA[update attach set fileName=?, caption=?, worktask_id=? where id=?]]>
+		</SQL>
+		<SQL name="getByIdSql">
+			<![CDATA[select * from attach where id = ?]]>
+		</SQL>
+		<SQL name="getListById">
+			<![CDATA[select id, filename, caption from attach where worktask_id = ?]]>
+		</SQL>
+	</class>
+
+	<class name="WorkNoteDao">
+		<SQL name="insertSql">
+			<![CDATA[insert into WorkNote(caption, noteDate, description, model_id, user_id) values (?, ?, ?, ?, ?)]]>
+		</SQL>
+		<SQL name="deleteSql">
+			<![CDATA[delete from WorkNote where id = ?]]>
+		</SQL>
+		<SQL name="updateSql">
+			<![CDATA[update WorkNote set caption=?, noteDate=?, description=?, model_id=?, user_id=? where id=?]]>
+		</SQL>
+		<SQL name="getByIdSql">
+			<![CDATA[select wn.*, WorkTask.caption, usertable.firstName, usertable.lastName
+						from WorkNote wn
+						join WorkTask on WorkTask.id = wn.model_id
+						join usertable on usertable.id = wn.user_id
+						where wn.id = ?]]>
+		</SQL>
+		<SQL name="getListById">
+			<![CDATA[select wn.id, wn.caption, wn.noteDate, usertable.firstName, usertable.lastName, wn.user_id
+						from WorkNote wn join usertable on usertable.id = wn.user_id where model_id = ?]]>
+		</SQL>
+	</class>
+
+	<class name="UserViewDao">
+		<SQL name="getAllSql">
+			<![CDATA[select id, firstname, lastname, caption, email from usertable]]>
+		</SQL>
+	</class>
+
+	<class name="UserDao">
+		<SQL name="insertSql">
+			<![CDATA[insert into usertable(firstname, lastname, caption, email, login, password, role_id) values (?, ?, ?, ?, ?, ?, ?)]]>
+		</SQL>
+		<SQL name="deleteSql">
+			<![CDATA[delete from usertable where id = ?]]>
+		</SQL>
+		<SQL name="updateSql">
+			<![CDATA[update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role_id=? where id=?]]>
+		</SQL>
+		<SQL name="getUserSql">
+			<![CDATA[select * from usertable where id = ?]]>
+		</SQL>
+	</class>
+
+</querry>

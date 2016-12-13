@@ -3,6 +3,7 @@ package com.java.servlets.dao;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.UserView;
 import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.SqlXmlReader;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,12 +13,15 @@ import java.util.List;
  * Created by proton2 on 23.10.2016.
  */
 public class UserViewDao implements ModelDao<UserView> {
-    private String getAllSql = "select id, firstname, lastname, caption, email from usertable";
+    //private String getAllSql = "select id, firstname, lastname, caption, email from usertable";
 
     private Connection connection;
+    String getAllSql;
 
     public UserViewDao() {
         connection = DbUtil.getConnection();
+        SqlXmlReader sl = new SqlXmlReader();
+        getAllSql = sl.getQuerry("UserViewDao", "getAllSql");
     }
 
     @Override

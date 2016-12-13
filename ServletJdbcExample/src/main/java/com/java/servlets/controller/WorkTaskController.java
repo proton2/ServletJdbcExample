@@ -66,8 +66,10 @@ public class WorkTaskController extends HttpServlet {
             WorkTask wt = (WorkTask) request.getSession().getAttribute("workTask");
             request.setAttribute("workTask", wt);
             request.setAttribute("taskuser", user);
-            request.setAttribute("attaches", DaoFactory.getListById(wt.getId(), Attach.class));
-            request.setAttribute("notes", DaoFactory.getListById(wt.getId(), WorkNote.class));
+            if (wt.getId()!=null) {
+                request.setAttribute("attaches", DaoFactory.getListById(wt.getId(), Attach.class));
+                request.setAttribute("notes", DaoFactory.getListById(wt.getId(), WorkNote.class));
+            }
             forward = INSERT_OR_EDIT;
         } else if (action.equalsIgnoreCase("delete_attach")) {
             Long attachId = Long.parseLong(request.getParameter("attach_id"));
@@ -133,10 +135,7 @@ public class WorkTaskController extends HttpServlet {
                 DaoFactory.update(wt);
             }
             request.getSession().removeAttribute("workTask");
-            forward = LIST_ITEMS;
-            request.setAttribute("workTasks", DaoFactory.getAll(WorkTaskView.class, 0, 0));
-            RequestDispatcher view = request.getRequestDispatcher(forward);
-            view.forward(request, response);
+            response.sendRedirect(LIST_WORKTASK_REDIRECT);
         } else if (buttonPressed.equalsIgnoreCase("Set user")) {
             WorkTask wt = helper.getWorkTaskFromRequest(request);
             request.getSession().setAttribute("workTask", wt);
