@@ -18,8 +18,6 @@ Small Web application - work tasks and deadlines. Like a little Jira.
 - Comments for tasks;
 - Logging into separatly log files;
 
-proton2@mail.ru
-
 Work task list
 ![Alt text](http://savepic.net/8688896.jpg)
 Work task notes
