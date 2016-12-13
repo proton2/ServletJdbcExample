@@ -1,6 +1,8 @@
 I create this training project for learning the basics of Java EE - servlet engine and JDBC (no more frameworks).
 The purpose of the project - to understand how the servlets and JDBC working.
 
+Small Web application - work tasks and deadlines. Like a little Jira.
+
 - Only Java Servlets API and Java JDBC without any frameworks (to study how Servlets and jdbc working). Using jsp;
 - Dao factory template to easy working with many dao;
 - Use caching (use ehcache provider);
