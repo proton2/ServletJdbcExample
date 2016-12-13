@@ -20,4 +20,4 @@ Small Web application - work tasks and deadlines. Like a little Jira.
 
 proton2@mail.ru
 
-![Alt text](http://savepic.net/8688896.htm][img]http://savepic.net/8688896m.jpg)
+![Alt text](http://savepic.net/8688896.jpg)
