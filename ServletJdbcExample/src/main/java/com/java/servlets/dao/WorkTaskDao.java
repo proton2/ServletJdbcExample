@@ -4,7 +4,7 @@ import com.java.servlets.model.Model;
 import com.java.servlets.model.TaskStatus;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkTask;
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
 import com.java.servlets.util.EHCacheManger;
 import com.java.servlets.util.SqlXmlReader;
 import net.sf.ehcache.Cache;
@@ -22,32 +22,24 @@ import java.util.List;
  * Created by proton2 on 06.08.2016.
  */
 public class WorkTaskDao implements ModelDao<WorkTask> {
-    //private String insertSql = "insert into WorkTask(taskuser_id, caption, taskContext, taskDate, deadLine, taskstatus_id) values (?, ?, ?, ?, ?, ?)";
-    //private String deleteSql = "delete from WorkTask where id = ?";
-    //private String updateSql = "update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?";
-    /*
-    private String getById = "select w.id, w.caption, w.taskContext, w.taskDate, w.deadLine, w.taskstatus_id, w.taskuser_id, u.firstName, u.lastName\n" +
-            "from WorkTask w join usertable u on w.taskuser_id = u.id\n" +
-            "where w.id = ?";*/
-
-    private Connection connection;
-    String getById, updateSql, deleteSql, insertSql;
+    private String insertSql, updateSql, deleteSql, getById;
 
     public WorkTaskDao() {
-        connection = DbUtil.getConnection();
-
         SqlXmlReader sl = new SqlXmlReader();
-        getById = sl.getQuerry("WorkTaskDao", "getById");
-        updateSql = sl.getQuerry("WorkTaskDao", "updateSql");
-        deleteSql = sl.getQuerry("WorkTaskDao", "deleteSql");
-        insertSql = sl.getQuerry("WorkTaskDao", "insertSql");
+        insertSql = sl.getQuerry("sql.xml", "WorkTaskDao", "insertSql");
+        updateSql = sl.getQuerry("sql.xml", "WorkTaskDao", "updateSql");
+        deleteSql = sl.getQuerry("sql.xml", "WorkTaskDao", "deleteSql");
+        getById = sl.getQuerry("sql.xml", "WorkTaskDao", "getById");
     }
 
     @Override
     public Long insert(Model item) {
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         WorkTask wt = (WorkTask) item;
         try {
-            PreparedStatement ps = connection.prepareStatement(insertSql);
+            ps = connection.prepareStatement(insertSql);
             ps.setLong(1, wt.getTaskUser().getId());
             ps.setString(2, wt.getCaption());
             ps.setString(3, wt.getTaskContext());
@@ -57,19 +49,27 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
+        Statement statement = null;
         Long insertId = -1L;
         try {
-            Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery("SELECT max(id) FROM WorkTask");
-            while (result.next()) {
-                insertId = result.getLong(1);
+            statement = connection.createStatement();
+            rs = statement.executeQuery("SELECT max(id) FROM WorkTask");
+            while (rs.next()) {
+                insertId = rs.getLong(1);
                 wt.setId(insertId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (statement != null) try {statement.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
+
         Cache cache = EHCacheManger.getCache();
         cache.put(new Element(insertId, wt));
 
@@ -77,13 +77,13 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     }
 
     public int importCollection(Collection<WorkTask> workTaskList){
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         int[] updateCounts = null;
         if (workTaskList!=null && !workTaskList.isEmpty()) {
-
             try {
                 connection.setAutoCommit(false);
-
-                PreparedStatement ps = connection.prepareStatement(insertSql);
+                ps = connection.prepareStatement(insertSql);
                 for (WorkTask workTask : workTaskList) {
                     ps.setLong(1, workTask.getTaskUser().getId());
                     ps.setString(2, workTask.getCaption());
@@ -91,11 +91,9 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     ps.setDate(4, new java.sql.Date(workTask.getTaskDate().getTime()));
                     ps.setDate(5, new java.sql.Date(workTask.getDeadLine().getTime()));
                     ps.setInt(6, workTask.getTaskStatus().ordinal());
-
                     ps.addBatch();
                 }
                 updateCounts = ps.executeBatch();
-
                 connection.commit();
             }  catch (SQLException e) {
                 try {
@@ -104,6 +102,9 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
                     e1.printStackTrace();
                 }
                 e.printStackTrace();
+            }finally {
+                if (ps != null) try {ps.close();} catch (SQLException e1) {e1.printStackTrace();}
+                try {connection.close();} catch (SQLException e2) {e2.printStackTrace();}
             }
         }
         return updateCounts == null ? null : updateCounts.length;
@@ -113,9 +114,12 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
     public void update(Model item) {
         Cache cache = EHCacheManger.getCache();
         cache.remove(item.getId());
+
+        WorkTask wt = (WorkTask) item;
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            WorkTask wt = (WorkTask) item;
-            PreparedStatement ps = connection.prepareStatement(updateSql);
+            ps = connection.prepareStatement(updateSql);
             ps.setLong(1, wt.getTaskUser().getId());
             ps.setString(2, wt.getCaption());
             ps.setString(3, wt.getTaskContext());
@@ -126,8 +130,11 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
-        cache.put(new Element(item.getId(), item));
+        cache.put(new Element(item.getId(), wt));
     }
 
     @Override
@@ -135,12 +142,17 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
         Cache cache = EHCacheManger.getCache();
         cache.remove(id);
 
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(deleteSql);
+            ps = connection.prepareStatement(deleteSql);
             ps.setLong(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
     }
 
@@ -156,10 +168,13 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
 
         wt = new WorkTask();
         wt.setId(itemId);
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(getById);
+            ps = connection.prepareStatement(getById);
             ps.setLong(1, itemId);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 wt.setCaption(rs.getString("caption"));
                 wt.setTaskContext(rs.getString("taskcontext"));
@@ -177,6 +192,10 @@ public class WorkTaskDao implements ModelDao<WorkTask> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         cache.put(new Element(itemId, wt));

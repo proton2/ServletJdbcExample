@@ -2,10 +2,13 @@ package com.java.servlets.dao;
 
 import com.java.servlets.model.Model;
 import com.java.servlets.model.UserView;
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
 import com.java.servlets.util.SqlXmlReader;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +16,12 @@ import java.util.List;
  * Created by proton2 on 23.10.2016.
  */
 public class UserViewDao implements ModelDao<UserView> {
-    //private String getAllSql = "select id, firstname, lastname, caption, email from usertable";
 
-    private Connection connection;
-    String getAllSql;
+    private String getAllSql;
 
     public UserViewDao() {
-        connection = DbUtil.getConnection();
         SqlXmlReader sl = new SqlXmlReader();
-        getAllSql = sl.getQuerry("UserViewDao", "getAllSql");
+        getAllSql = sl.getQuerry("sql.xml", "UserViewDao", "getAllSql");
     }
 
     @Override
@@ -31,20 +31,21 @@ public class UserViewDao implements ModelDao<UserView> {
 
     @Override
     public void update(Model item) {
-
     }
 
     @Override
     public void delete(Long id) {
-
     }
 
     @Override
     public List<UserView> getAll(int offcet, int limit) {
+        Connection connection = DataSource.getInstance().getConnection();
+        Statement st = null;
+        ResultSet rs = null;
         List<UserView> users = new ArrayList<>();
         try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery(getAllSql);
+            st = connection.createStatement();
+            rs = st.executeQuery(getAllSql);
             while (rs.next()) {
                 UserView user = new UserView();
                 user.setId(rs.getLong("id"));
@@ -56,6 +57,10 @@ public class UserViewDao implements ModelDao<UserView> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (st != null) try {st.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
         return users;
     }

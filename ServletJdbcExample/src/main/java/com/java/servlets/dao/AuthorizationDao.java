@@ -1,7 +1,7 @@
 package com.java.servlets.dao;
 
 import com.java.servlets.model.UserRole;
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,19 +12,19 @@ import java.sql.SQLException;
  * Created by proton2 on 29.10.2016.
  */
 public class AuthorizationDao {
-    private String checkUserSql = "select login, password, role_id from usertable where login = ?";
-    private String getUserIdSql = "select id from usertable where login = ?";
-    private Connection connection;
 
     public AuthorizationDao() {
-        connection = DbUtil.getConnection();
     }
 
     public UserRole checkAccess(String login, String password) {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection connection = DataSource.getInstance().getConnection();
+        String checkUserSql = "select login, password, role_id from usertable where login = ?";
         try {
-            PreparedStatement ps = connection.prepareStatement(checkUserSql);
+            ps = connection.prepareStatement(checkUserSql);
             ps.setString(1, login);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 int role_id = rs.getInt("role_id");
 
@@ -34,6 +34,10 @@ public class AuthorizationDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         return null;
@@ -41,15 +45,23 @@ public class AuthorizationDao {
 
     public Long getUserId(String login) {
         Long id = -1l;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection connection = DataSource.getInstance().getConnection();
+        String getUserIdSql = "select id from usertable where login = ?";
         try {
-            PreparedStatement ps = connection.prepareStatement(getUserIdSql);
+            ps = connection.prepareStatement(getUserIdSql);
             ps.setString(1, login);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 id = rs.getLong("id");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
         return id;
     }

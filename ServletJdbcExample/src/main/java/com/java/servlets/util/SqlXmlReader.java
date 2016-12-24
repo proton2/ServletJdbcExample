@@ -1,9 +1,9 @@
 package com.java.servlets.util;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,14 +17,12 @@ import java.io.IOException;
  */
 public class SqlXmlReader {
 
-
-
     public SqlXmlReader() {
     }
 
-    public String getQuerry(String className, String querryName){
+    public String getQuerry(String fileName, String className, String querryName) {
         ClassLoader classLoader = getClass().getClassLoader();
-        File fXmlFile = new File(classLoader.getResource("sql.xml").getFile());
+        File fXmlFile = new File(classLoader.getResource(fileName).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null;
         try {
@@ -35,13 +33,11 @@ public class SqlXmlReader {
         Document doc = null;
         try {
             doc = dBuilder.parse(fXmlFile);
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SAXException | IOException e) {
             e.printStackTrace();
         }
         doc.getDocumentElement().normalize();
-        if(!doc.getDocumentElement().getNodeName().equalsIgnoreCase("querry")){
+        if (!doc.getDocumentElement().getNodeName().equalsIgnoreCase("querry")) {
             return null;
         }
         NodeList nList = doc.getElementsByTagName("class");
@@ -53,13 +49,13 @@ public class SqlXmlReader {
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode;
 
-                if (className.equalsIgnoreCase(eElement.getAttribute("name"))){
+                if (className.equalsIgnoreCase(eElement.getAttribute("name"))) {
                     NodeList sqlList = eElement.getElementsByTagName("SQL");
-                    for (int i=0; i<sqlList.getLength(); i++){
+                    for (int i = 0; i < sqlList.getLength(); i++) {
                         Node sqlNode = sqlList.item(i);
-                        if (sqlNode.getNodeType() == Node.ELEMENT_NODE){
+                        if (sqlNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element sqlElement = (Element) sqlNode;
-                            if (querryName.equalsIgnoreCase(sqlElement.getAttribute("name"))){
+                            if (querryName.equalsIgnoreCase(sqlElement.getAttribute("name"))) {
                                 return sqlElement.getFirstChild().getNextSibling().getNodeValue();
                             }
                         }

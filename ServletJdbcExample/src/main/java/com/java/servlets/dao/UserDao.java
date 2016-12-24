@@ -3,40 +3,37 @@ package com.java.servlets.dao;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.UserRole;
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
 import com.java.servlets.util.EHCacheManger;
 import com.java.servlets.util.SqlXmlReader;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 class UserDao implements ModelDao<User> {
-    /*
-    private String insertSql = "insert into usertable(firstname, lastname, caption, email, login, password, role_id) values (?, ?, ?, ?, ?, ?, ?)";
-    private String deleteSql = "delete from usertable where id = ?";
-    private String updateSql = "update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role_id=? where id=?";
-    private String getUserSql = "select * from usertable where id = ?";
-    */
-
-    private Connection connection;
-    String insertSql, deleteSql, updateSql, getUserSql;
+    String insertSql, updateSql, deleteSql, getUserSql;
 
     UserDao() {
-        connection = DbUtil.getConnection();
         SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("UserDao", "insertSql");
-        deleteSql = sl.getQuerry("UserDao", "deleteSql");
-        updateSql = sl.getQuerry("UserDao", "updateSql");
-        getUserSql = sl.getQuerry("UserDao", "getUserSql");
+        insertSql = sl.getQuerry("sql.xml", "UserDao", "insertSql");
+        updateSql = sl.getQuerry("sql.xml", "UserDao", "updateSql");
+        deleteSql = sl.getQuerry("sql.xml", "UserDao", "deleteSql");
+        getUserSql = sl.getQuerry("sql.xml", "UserDao", "getUserSql");
     }
 
     @Override
     public Long insert(Model item) {
         User user = (User) item;
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(insertSql);
+            ps = connection.prepareStatement(insertSql);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getCaption());
@@ -47,19 +44,28 @@ class UserDao implements ModelDao<User> {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         Long insertId = -1L;
+        Statement statement = null;
+        ResultSet resultSet = null;
         try {
-            Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery("SELECT max(id) FROM usertable");
-            while (result.next()) {
-                insertId = result.getLong(1);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("SELECT max(id) FROM usertable");
+            while (resultSet.next()) {
+                insertId = resultSet.getLong(1);
                 user.setId(insertId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (resultSet != null) try {resultSet.close();} catch (SQLException e) {e.printStackTrace();}
+            if (statement != null) try {statement.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
+
         Cache cache = EHCacheManger.getCache();
         cache.put(new Element(insertId, user));
 
@@ -70,9 +76,12 @@ class UserDao implements ModelDao<User> {
     public void update(Model item) {
         Cache cache = EHCacheManger.getCache();
         cache.remove(item.getId());
+
+        User user = (User) item;
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            User user = (User) item;
-            PreparedStatement ps = connection.prepareStatement(updateSql);
+            ps = connection.prepareStatement(updateSql);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getCaption());
@@ -84,8 +93,11 @@ class UserDao implements ModelDao<User> {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
-        cache.put(new Element(item.getId(), item));
+        cache.put(new Element(item.getId(), user));
     }
 
     @Override
@@ -93,12 +105,25 @@ class UserDao implements ModelDao<User> {
         Cache cache = EHCacheManger.getCache();
         cache.remove(userId);
 
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(deleteSql);
+            ps = connection.prepareStatement(deleteSql);
             ps.setLong(1, userId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (connection != null) try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -112,10 +137,14 @@ class UserDao implements ModelDao<User> {
 
         User user = new User();
         user.setId(userId);
+
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(getUserSql);
+            ps = connection.prepareStatement(getUserSql);
             ps.setLong(1, userId);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if (rs.next()) {
                 user.setFirstName(rs.getString("firstname"));
                 user.setLastName(rs.getString("lastname"));
@@ -129,6 +158,10 @@ class UserDao implements ModelDao<User> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         cache.put(new Element(userId, user));

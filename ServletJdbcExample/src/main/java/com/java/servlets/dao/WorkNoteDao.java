@@ -4,7 +4,7 @@ import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
 import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
 import com.java.servlets.util.EHCacheManger;
 import com.java.servlets.util.SqlXmlReader;
 import net.sf.ehcache.Cache;
@@ -21,39 +21,25 @@ import java.util.List;
 /**
  * Created by proton2 on 21.11.2016.
  */
-public class WorkNoteDao implements ModelDao<WorkNote>{
-/*
-    private String insertSql = "insert into WorkNote(caption, noteDate, description, model_id, user_id) values (?, ?, ?, ?, ?)";
-    private String deleteSql = "delete from WorkNote where id = ?";
-    private String updateSql = "update WorkNote set caption=?, noteDate=?, description=?, model_id=?, user_id=? where id=?";
-    private String getByIdSql = "select wn.*, WorkTask.caption, usertable.firstName, usertable.lastName  \n" +
-            "from WorkNote wn \n" +
-            "join WorkTask on WorkTask.id = wn.model_id\n" +
-            "join usertable on usertable.id = wn.user_id\n" +
-            "where wn.id = ?";
-    private String getListById = "select wn.id, wn.caption, wn.noteDate, usertable.firstName, usertable.lastName, wn.user_id\n"+
-            "from WorkNote wn\n" +
-            "join usertable on usertable.id = wn.user_id\n" +
-            "where model_id = ?";
-*/
-    private Connection connection;
-    String insertSql, deleteSql, updateSql, getByIdSql, getListById;
+public class WorkNoteDao implements ModelDao<WorkNote> {
+    private String insertSql, updateSql, deleteSql, getByIdSql, getListById;
 
-    WorkNoteDao(){
-        connection = DbUtil.getConnection();
+    WorkNoteDao() {
         SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("WorkNoteDao", "insertSql");
-        deleteSql = sl.getQuerry("WorkNoteDao", "deleteSql");
-        updateSql = sl.getQuerry("WorkNoteDao", "updateSql");
-        getByIdSql = sl.getQuerry("WorkNoteDao", "getByIdSql");
-        getListById = sl.getQuerry("WorkNoteDao", "getListById");
+        insertSql = sl.getQuerry("sql.xml", "WorkNoteDao", "insertSql");
+        updateSql = sl.getQuerry("sql.xml", "WorkNoteDao", "updateSql");
+        deleteSql = sl.getQuerry("sql.xml", "WorkNoteDao", "deleteSql");
+        getByIdSql = sl.getQuerry("sql.xml", "WorkNoteDao", "getByIdSql");
+        getListById = sl.getQuerry("sql.xml", "WorkNoteDao", "getListById");
     }
 
     @Override
     public Long insert(Model item) {
         WorkNote workNote = (WorkNote) item;
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(insertSql);
+            ps = connection.prepareStatement(insertSql);
             ps.setString(1, workNote.getCaption());
             ps.setDate(2, new java.sql.Date(workNote.getNoteDate().getTime()));
             ps.setString(3, workNote.getDescription());
@@ -62,19 +48,29 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         Long insertId = -1L;
+        Statement statement = null;
+        ResultSet resultSet = null;
         try {
-            Statement select = connection.createStatement();
-            ResultSet result = select.executeQuery("SELECT max(id) FROM WorkNote");
-            while (result.next()) {
-                insertId = result.getLong(1);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("SELECT max(id) FROM WorkNote");
+            while (resultSet.next()) {
+                insertId = resultSet.getLong(1);
                 workNote.setId(insertId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (resultSet != null) try {resultSet.close();} catch (SQLException e) {e.printStackTrace();}
+            if (statement != null) try {statement.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
+        Cache cache = EHCacheManger.getCache();
+        cache.put(new Element(insertId, workNote));
 
         return insertId;
     }
@@ -83,9 +79,12 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
     public void update(Model item) {
         Cache cache = EHCacheManger.getCache();
         cache.remove(item.getId());
+
+        WorkNote workNote = (WorkNote) item;
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            WorkNote workNote = (WorkNote) item;
-            PreparedStatement ps = connection.prepareStatement(updateSql);
+            ps = connection.prepareStatement(updateSql);
             ps.setString(1, workNote.getCaption());
             ps.setDate(2, new java.sql.Date(workNote.getNoteDate().getTime()));
             ps.setString(3, workNote.getDescription());
@@ -95,8 +94,11 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
-        cache.put(new Element(item.getId(), item));
+        cache.put(new Element(item.getId(), workNote));
     }
 
     @Override
@@ -104,12 +106,17 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
         Cache cache = EHCacheManger.getCache();
         cache.remove(id);
 
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(deleteSql);
+            ps = connection.prepareStatement(deleteSql);
             ps.setLong(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
     }
 
@@ -130,8 +137,10 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
 
         wn = new WorkNote();
         wn.setId(itemId);
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(getByIdSql);
+            ps = connection.prepareStatement(getByIdSql);
             ps.setLong(1, itemId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -152,6 +161,9 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         cache.put(new Element(itemId, wn));
@@ -166,10 +178,13 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
     @Override
     public List<WorkNote> getListById(Long itemId) {
         List<WorkNote> workNotes = new ArrayList<>();
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement ps = connection.prepareStatement(getListById);
+            ps = connection.prepareStatement(getListById);
             ps.setLong(1, itemId);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 WorkNote wn = new WorkNote();
                 wn.setId(rs.getLong("id"));
@@ -184,6 +199,10 @@ public class WorkNoteDao implements ModelDao<WorkNote>{
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         return workNotes;

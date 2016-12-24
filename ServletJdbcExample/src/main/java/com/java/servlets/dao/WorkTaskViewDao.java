@@ -2,10 +2,13 @@ package com.java.servlets.dao;
 
 import com.java.servlets.model.Model;
 import com.java.servlets.model.WorkTaskView;
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
 import com.java.servlets.util.SqlXmlReader;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,56 +16,46 @@ import java.util.List;
  * Created by proton2 on 23.10.2016.
  */
 public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
-    /*
-    private String getAllSql = "select w.id, w.caption, w.taskDate, w.deadLine, w.taskstatus_id, u.firstName, u.lastName\n" +
-            "from WorkTask w\n" +
-            "join usertable u on w.taskuser_id = u.id\n" +
-            "offset ? limit ?";
-
-    private String getUserWorkTasks = "select id, caption, taskDate, deadLine, taskstatus_id\n" +
-            "from WorkTask where taskuser_id = ?";
-    */
-    private Connection connection;
     private int numOfRdcords;
-    String getAllSql, getUserWorkTasks;
+    private String getAllSql, getUserWorkTasks;
 
     public WorkTaskViewDao() {
-        connection = DbUtil.getConnection();
-
         SqlXmlReader sl = new SqlXmlReader();
-        getAllSql = sl.getQuerry("WorkTaskViewDao", "getall");
-        getUserWorkTasks = sl.getQuerry("WorkTaskViewDao", "getUserWorkTasks");
+        getAllSql = sl.getQuerry("sql.xml", "WorkTaskViewDao", "getall");
+        getUserWorkTasks = sl.getQuerry("sql.xml", "WorkTaskViewDao", "getUserWorkTasks");
     }
 
     @Override
     public List<WorkTaskView> getAll(int offset, int limit) {
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         List<WorkTaskView> workTasks = new ArrayList<>();
         try {
-            PreparedStatement ps = connection.prepareStatement(getAllSql);
+            ps = connection.prepareStatement(getAllSql);
             ps.setInt(1, offset);
             ps.setInt(2, limit);
-            ResultSet rs = ps.executeQuery();
-
+            rs = ps.executeQuery();
             while (rs.next()) {
                 WorkTaskView workTask = new WorkTaskView();
                 workTask.setId(rs.getLong("id"));
                 workTask.setCaption(rs.getString("caption"));
                 workTask.setTaskDate(rs.getDate("taskdate"));
                 workTask.setDeadLine(rs.getDate("deadline"));
-
                 int t_stat = rs.getInt("taskstatus_id");
                 workTask.setTaskStatus(t_stat == 0 ? "NEW" : (t_stat == 1 ? "CLOSED" : "ACTUAL"));
                 workTask.setTaskUser(rs.getString("firstName") + " " + rs.getString("lastName"));
-
                 workTasks.add(workTask);
             }
-
             ps = connection.prepareStatement("select count(*) from worktask");
             rs = ps.executeQuery();
             if (rs.next()) {this.numOfRdcords = rs.getInt(1);}
-
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         return workTasks;
@@ -70,11 +63,14 @@ public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
 
     @Override
     public List<WorkTaskView> getListById(Long itemId) {
+        Connection connection = DataSource.getInstance().getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         List<WorkTaskView> workTasks = new ArrayList<>();
         try {
-            PreparedStatement ps = connection.prepareStatement(getUserWorkTasks);
+            ps = connection.prepareStatement(getUserWorkTasks);
             ps.setLong(1, itemId);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 WorkTaskView workTask = new WorkTaskView();
                 workTask.setId(rs.getLong("id"));
@@ -88,6 +84,10 @@ public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
+            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
+            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
 
         return workTasks;
@@ -100,12 +100,10 @@ public class WorkTaskViewDao implements ModelDao<WorkTaskView> {
 
     @Override
     public void update(Model item) {
-
     }
 
     @Override
     public void delete(Long id) {
-
     }
 
     @Override

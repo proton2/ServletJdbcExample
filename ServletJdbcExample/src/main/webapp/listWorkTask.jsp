@@ -40,7 +40,7 @@
     	</tbody>
     </table>
 
-    <jsp:include page="PagesWorkTask.jsp"></jsp:include>
+    <jsp:include page="pagesWorkTask.jsp"></jsp:include>
     <p><a href = "WorkTaskController?action=">Add workTask</a></p>
 
     <form name="frmImportWorkNote" method="POST" action="WorkTaskController" enctype="multipart/form-data">

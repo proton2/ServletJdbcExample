@@ -1,6 +1,7 @@
 package com.java.servlets.listener;
 
-import com.java.servlets.util.DbUtil;
+import com.java.servlets.util.DataSource;
+//import com.java.servlets.util.DbUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +14,13 @@ public class AppContextListener implements ServletContextListener{
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		DbUtil.setDbproperties(sce.getServletContext().getInitParameter("dbproperties"));
-		DbUtil.getConnection();
+		DataSource.setDbproperties(sce.getServletContext().getInitParameter("dbproperties"));
+		//DbUtil.getConnection();
 		LOGGER.info("------debug----- context initialized success");
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		DbUtil.closeConnection();
+		//DbUtil.closeConnection();
 	}
 }
