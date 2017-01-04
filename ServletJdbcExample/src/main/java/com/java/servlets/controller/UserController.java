@@ -4,7 +4,7 @@ import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.User;
 import com.java.servlets.model.UserView;
 import com.java.servlets.model.WorkTaskView;
-import com.java.servlets.util.ServletHelper;
+import com.java.servlets.controller.Service.ServletHelper;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,11 +19,8 @@ public class UserController extends HttpServlet{
     private static String LIST_USER = "/listUser.jsp";
 	private static String LIST_USER2 = "UserController?action=list";
 
-	private ServletHelper helper;
-
     public UserController(){
     	super();
-		helper = new ServletHelper();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -58,7 +55,7 @@ public class UserController extends HttpServlet{
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	User user1 = helper.getUserFromRequest(request);
+    	User user1 = ServletHelper.getUserFromRequest(request);
     	if (user1.getId() == null){
 			DaoFactory.insert(user1);
     	}

@@ -17,7 +17,7 @@ create table if not exists public.usertable (
 	email varchar(255),
 	login varchar(255) UNIQUE,
 	password varchar(255),
-	role_id integer,
+	role_id varchar(64),
 	CONSTRAINT usertablepk PRIMARY KEY (id)
 );
 
@@ -28,7 +28,7 @@ create table if not exists public.worktask(
   taskcontext varchar(255),
   taskdate timestamp without time zone,
   taskuser_id bigint,
-  taskstatus_id integer,
+  taskstatus_id varchar(64),
   CONSTRAINT worktaskpk PRIMARY KEY (id),
   CONSTRAINT fk_oam3n63solk5k7h80o8lqimrh FOREIGN KEY (taskuser_id)
       REFERENCES public.usertable (id) MATCH SIMPLE
@@ -64,46 +64,46 @@ create table if not exists public.WorkNote (
 );
 
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111', 2);
+('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru', 'stx1', '222', 2);
+('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru', 'stx1', '222', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru', 'vpt', '333', 2);
+('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru', 'vpt', '333', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru', 'ast', '444', 2);
+('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru', 'ast', '444', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru', 'test1', '555', 2);
+('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru', 'test1', '555', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru', 'test2', '666', 2);
+('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru', 'test2', '666', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru', 'admin-gr', '777', 2);
+('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru', 'admin-gr', '777', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru', 'gr-1', '888', 2);
+('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru', 'gr-1', '888', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru', 'gr-2', '999', 2);
+('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru', 'gr-2', '999', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru', 'gr-3', '101', 2);
+('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru', 'gr-3', '101', 'user');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru', 'lead', '102', 1);
+('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru', 'lead', '102', 'boss');
 insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('administrator', 'Admin', 'Admin', 'admin@mycomp.ru', 'root', 'root', 0);
+('administrator', 'Admin', 'Admin', 'admin@mycomp.ru', 'root', 'root', 'admin');
 
 insert into public.worktask (caption, taskdate, deadline, taskcontext, taskuser_id, taskstatus_id) values
-('Test task', '04.09.2016', '05.09.2016', 'test current build', (select id from usertable where usertable.email='test2@mycomp.ru'), 0);
+('Test task', '04.09.2016', '05.09.2016', 'test current build', (select id from usertable where usertable.email='test2@mycomp.ru'), 'NEW');
 insert into public.worktask (caption, taskdate, deadline, taskcontext, taskuser_id, taskstatus_id) values
-('Test stend', '02.09.2016', '04.09.2016', 'Create test stend', (select id from usertable where usertable.email='admin-gr@mycomp.ru'), 0);
+('Test stend', '02.09.2016', '04.09.2016', 'Create test stend', (select id from usertable where usertable.email='admin-gr@mycomp.ru'), 'NEW');
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
-('Plan description', '31.08.2016', '06.09.2016', 'Make technical description', (select id from usertable where usertable.email='lead@mycomp.ru'), 0);
+('Plan description', '31.08.2016', '06.09.2016', 'Make technical description', (select id from usertable where usertable.email='lead@mycomp.ru'), 'NEW');
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
-('Product details', '05.09.2016', '08.09.2016', 'Make technical description', (select id from usertable where usertable.email='vpt@mycomp.ru'), 0);
+('Product details', '05.09.2016', '08.09.2016', 'Make technical description', (select id from usertable where usertable.email='vpt@mycomp.ru'), 'NEW');
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
-('report mechanism', '01.09.2016', '03.09.2016', 'Create report engine', (select id from usertable where usertable.email='gr-2@mycomp.ru'), 0);
+('report mechanism', '01.09.2016', '03.09.2016', 'Create report engine', (select id from usertable where usertable.email='gr-2@mycomp.ru'), 'NEW');
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
-('log report', '05.09.2016', '06.09.2016', 'Create log report class', (select id from usertable where usertable.email='gr-3@mycomp.ru'), 1);
+('log report', '05.09.2016', '06.09.2016', 'Create log report class', (select id from usertable where usertable.email='gr-3@mycomp.ru'), 'CLOSED');
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
-('attach loading', '04.09.2016', '07.09.2016', 'Create attach loading class', (select id from usertable where usertable.email='gr-1@mycomp.ru'), 2);
+('attach loading', '04.09.2016', '07.09.2016', 'Create attach loading class', (select id from usertable where usertable.email='gr-1@mycomp.ru'), 'ACTUAL');
 insert into public.worktask (caption, taskdate, deadline, taskcontext,  taskuser_id, taskstatus_id) values
-('Regress test', '06.09.2016', '07.09.2016', 'perform regress test', (select id from usertable where usertable.email='test1@mycomp.ru'), 2);
+('Regress test', '06.09.2016', '07.09.2016', 'perform regress test', (select id from usertable where usertable.email='test1@mycomp.ru'), 'ACTUAL');
 
 insert into public.worknote(caption, notedate, description, model_id, user_id) values
 ('my comment', '2016-11-26', 'note about this task', (select id from worktask wt where wt.caption = 'attach loading' and wt.taskcontext = 'Create attach loading class'), (select id from usertable where email = 'admin@mycomp.ru'));

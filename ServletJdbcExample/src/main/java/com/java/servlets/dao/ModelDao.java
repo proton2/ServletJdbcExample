@@ -20,5 +20,5 @@ public interface ModelDao<T extends Model> {
 
     T getById(Long itemId);
 
-    int getNumOfRecoeds();
+    int getNumOfRecords();
 }

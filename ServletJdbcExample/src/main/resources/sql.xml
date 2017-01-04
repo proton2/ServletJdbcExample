@@ -3,17 +3,27 @@
 
 	<class name="WorkTaskViewDao">
 		<SQL name="getall">
-			<![CDATA[select w.id, w.caption, w.taskDate, w.deadLine, w.taskstatus_id, u.firstName, u.lastName from WorkTask w join usertable u on w.taskuser_id = u.id offset ? limit ?]]>
+			<![CDATA[select WorkTask.id as WorkTaskView_id, WorkTask.caption as WorkTaskView_caption,
+			WorkTask.taskDate as WorkTaskView_taskDate, WorkTask.deadLine as WorkTaskView_deadLine,
+			WorkTask.taskstatus_id as WorkTaskView_taskStatus,
+			usertable.firstName || ' ' || usertable.lastName as WorkTaskView_taskUser
+			from WorkTask join usertable on WorkTask.taskuser_id = usertable.id offset ? limit ?]]>
 		</SQL>
 		<SQL name="getUserWorkTasks">
-			<![CDATA[select id, caption, taskDate, deadLine, taskstatus_id from WorkTask where taskuser_id = ?]]>
+			<![CDATA[select WorkTask.id as WorkTaskView_id, WorkTask.caption as WorkTaskView_caption,
+			WorkTask.taskDate as WorkTaskView_taskDate, WorkTask.deadLine as WorkTaskView_deadLine,
+			WorkTask.taskstatus_id as WorkTaskView_taskStatus from WorkTask where taskuser_id = ?]]>
 		</SQL>
 	</class>
 
 	<class name="WorkTaskDao">
 		<SQL name="getById">
-			<![CDATA[select w.id, w.caption, w.taskContext, w.taskDate, w.deadLine, w.taskstatus_id, w.taskuser_id, u.firstName, u.lastName
-			from WorkTask w join usertable u on w.taskuser_id = u.id where w.id = ?]]>
+			<![CDATA[select WorkTask.id as WorkTask_id, WorkTask.caption as WorkTask_caption,
+			WorkTask.taskContext as WorkTask_taskContext, WorkTask.taskDate as WorkTask_taskDate,
+			WorkTask.deadLine as WorkTask_deadLine, WorkTask.taskstatus_id as taskStatus_id,
+			WorkTask.taskuser_id as taskUser_id, usertable.firstName as taskUser_firstName,
+			usertable.lastName as taskUser_lastName
+			from WorkTask join usertable on WorkTask.taskuser_id = usertable.id where WorkTask.id =?]]>
 		</SQL>
 		<SQL name="updateSql">
 			<![CDATA[update WorkTask set taskuser_id=?, caption=?, taskContext=?, taskDate=?, deadLine=?, taskstatus_id=?  where id=?]]>
@@ -37,10 +47,13 @@
 			<![CDATA[update attach set fileName=?, caption=?, worktask_id=? where id=?]]>
 		</SQL>
 		<SQL name="getByIdSql">
-			<![CDATA[select * from attach where id = ?]]>
+			<![CDATA[select attach.id as attach_id, attach.filename as attach_filename,
+			attach.caption as attach_caption, attach.worktask_id as worktask_id from attach
+			where attach.id = ?]]>
 		</SQL>
 		<SQL name="getListById">
-			<![CDATA[select id, filename, caption from attach where worktask_id = ?]]>
+			<![CDATA[select attach.id as attach_id, attach.filename as attach_filename, attach.caption as attach_caption
+			from attach where worktask_id = ?]]>
 		</SQL>
 	</class>
 
@@ -55,21 +68,25 @@
 			<![CDATA[update WorkNote set caption=?, noteDate=?, description=?, model_id=?, user_id=? where id=?]]>
 		</SQL>
 		<SQL name="getByIdSql">
-			<![CDATA[select wn.*, WorkTask.caption, usertable.firstName, usertable.lastName
+			<![CDATA[select wn.id as worknote_id, wn.caption as worknote_caption, wn.notedate as worknote_notedate, wn.description as worknote_description,
+			wn.model_id as subject_id, WorkTask.caption as subject_caption,
+			wn.user_id as noteUser_id, usertable.firstName as noteUser_firstname, usertable.lastName as noteUser_lastname
 						from WorkNote wn
 						join WorkTask on WorkTask.id = wn.model_id
 						join usertable on usertable.id = wn.user_id
 						where wn.id = ?]]>
 		</SQL>
 		<SQL name="getListById">
-			<![CDATA[select wn.id, wn.caption, wn.noteDate, usertable.firstName, usertable.lastName, wn.user_id
+			<![CDATA[select wn.id as worknote_id, wn.caption as worknote_caption, wn.noteDate as worknote_notedate,
+			 wn.user_id as noteUser_id, usertable.firstName as noteUser_firstname, usertable.lastName as noteUser_lastname
 						from WorkNote wn join usertable on usertable.id = wn.user_id where model_id = ?]]>
 		</SQL>
 	</class>
 
 	<class name="UserViewDao">
 		<SQL name="getAllSql">
-			<![CDATA[select id, firstname, lastname, caption, email from usertable]]>
+			<![CDATA[select usertable.id as userview_id, usertable.firstname as userview_firstname, usertable.lastname as userview_lastname,
+			usertable.caption as userview_caption, usertable.email as userview_email from usertable]]>
 		</SQL>
 	</class>
 
@@ -84,7 +101,10 @@
 			<![CDATA[update usertable set firstname=?, lastname=?, caption=?, email=?, login=?, password=?, role_id=? where id=?]]>
 		</SQL>
 		<SQL name="getUserSql">
-			<![CDATA[select * from usertable where id = ?]]>
+			<![CDATA[select usertable.id as user_id, usertable.firstname as user_firstname,
+			usertable.lastname as user_lastname, usertable.caption as user_caption, usertable.email as user_email,
+			usertable.login as user_login, usertable.password as user_password, usertable.role_id as role_id
+			from usertable where id = ?]]>
 		</SQL>
 	</class>
 

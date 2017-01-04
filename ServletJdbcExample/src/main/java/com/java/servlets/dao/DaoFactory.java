@@ -1,5 +1,11 @@
 package com.java.servlets.dao;
 
+import com.java.servlets.dao.impl.AttachDao;
+import com.java.servlets.dao.impl.UserDao;
+import com.java.servlets.dao.impl.UserViewDao;
+import com.java.servlets.dao.impl.WorkNoteDao;
+import com.java.servlets.dao.impl.WorkTaskDao;
+import com.java.servlets.dao.impl.WorkTaskViewDao;
 import com.java.servlets.model.*;
 
 import java.util.HashMap;
@@ -50,8 +56,8 @@ public class DaoFactory {
         return getDao(dtoClass).getAll(offcet, limit);
     }
 
-    public static int getNumOfRecoeds(Class<? extends Model> dtoClass){
-        return getDao(dtoClass).getNumOfRecoeds();
+    public static int getNumOfRecords(Class<? extends Model> dtoClass){
+        return getDao(dtoClass).getNumOfRecords();
     }
 
     public static List<? extends Model> getListById(Long id, Class<? extends Model> dtoClass) {

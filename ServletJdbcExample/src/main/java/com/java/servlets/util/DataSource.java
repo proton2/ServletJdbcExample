@@ -13,7 +13,7 @@ import java.util.Properties;
  * Created by proton2 on 24.12.2016.
  */
 public class DataSource {
-    private static DataSource     datasource;
+    private static DataSource datasource;
     private BasicDataSource ds;
     private static String dbproperties;
 

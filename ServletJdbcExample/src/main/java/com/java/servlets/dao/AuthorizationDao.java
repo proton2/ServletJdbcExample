@@ -26,10 +26,9 @@ public class AuthorizationDao {
             ps.setString(1, login);
             rs = ps.executeQuery();
             if (rs.next()) {
-                int role_id = rs.getInt("role_id");
-
+                String role_id = rs.getString("role_id");
                 if(login.equals(rs.getString("login")) && password.equals(rs.getString("password"))){
-                    return role_id == 0 ? UserRole.admin : (role_id == 1 ? UserRole.boss : UserRole.user);
+                    return role_id.equalsIgnoreCase("admin") ? UserRole.admin : (role_id.equalsIgnoreCase("boss") ? UserRole.boss : UserRole.user);
                 }
             }
         } catch (SQLException e) {

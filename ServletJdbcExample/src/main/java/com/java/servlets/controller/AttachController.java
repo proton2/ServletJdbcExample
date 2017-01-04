@@ -2,7 +2,7 @@ package com.java.servlets.controller;
 
 import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.model.Attach;
-import com.java.servlets.util.ServletHelper;
+import com.java.servlets.controller.Service.ServletHelper;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,11 +21,8 @@ public class AttachController extends HttpServlet {
     private static String INSERT_OR_EDIT_ATTACH = "/attach.jsp";
     private String forward = "";
 
-    private ServletHelper helper;
-
     public AttachController() {
         super();
-        helper = new ServletHelper();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -35,7 +32,7 @@ public class AttachController extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Attach attach = helper.getAttachFromRequest(request);
+        Attach attach = ServletHelper.getAttachFromRequest(request);
 
         if (attach.getFileName() != null && attach.getId() == null){
             DaoFactory.insert(attach);

@@ -1,4 +1,4 @@
-package com.java.servlets.util;
+package com.java.servlets.controller.Service;
 
 import com.java.servlets.controller.LoginServlet;
 import com.java.servlets.dao.AuthorizationDao;
@@ -9,6 +9,7 @@ import com.java.servlets.model.User;
 import com.java.servlets.model.UserRole;
 import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
+import com.java.servlets.util.SysHelper;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -37,7 +38,7 @@ public class ServletHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginServlet.class);
 
-    public WorkTask getWorkTaskFromRequest(HttpServletRequest request) {
+    public static WorkTask getWorkTaskFromRequest(HttpServletRequest request) {
         WorkTask wt = new WorkTask();
 
         String id = request.getParameter("id");
@@ -77,7 +78,7 @@ public class ServletHelper {
         return wt;
     }
 
-    public User getUserFromRequest(HttpServletRequest request) {
+    public static User getUserFromRequest(HttpServletRequest request) {
         User user = new User();
         user.setFirstName(request.getParameter("firstname"));
         user.setLastName(request.getParameter("lastname"));
@@ -95,7 +96,7 @@ public class ServletHelper {
         return user;
     }
 
-    public WorkNote getWorkNoteFromRequest(HttpServletRequest request) {
+    public static WorkNote getWorkNoteFromRequest(HttpServletRequest request) {
         WorkNote wn = new WorkNote();
 
         String id = request.getParameter("worknote_id");
@@ -128,15 +129,15 @@ public class ServletHelper {
         return wn;
     }
 
-    public Collection<WorkTask> importWorkTasks(HttpServletRequest request) throws IOException, ServletException {
+    public static Collection<WorkTask> importWorkTasks(HttpServletRequest request) throws IOException, ServletException {
         Part filePart = request.getPart("excelFile");
-        String partFile = getFileName1(filePart);
+        String partFile = SysHelper.getFileName1(filePart);
         if (partFile.isEmpty()) {
             return null;
         }
         InputStream inputStream = filePart.getInputStream();
 
-        String fileExt = getFileExt(partFile);
+        String fileExt = SysHelper.getFileExt(partFile);
         Workbook wb = null;
         if (fileExt.equalsIgnoreCase("xls")) {
             wb = new HSSFWorkbook(inputStream);
@@ -196,7 +197,7 @@ public class ServletHelper {
         return workTaskList;
     }
 
-    public Attach getAttachFromRequest(HttpServletRequest request) throws IOException, ServletException {
+    public static Attach getAttachFromRequest(HttpServletRequest request) throws IOException, ServletException {
         Attach attach = new Attach();
 
         String uploadFilePath = request.getServletContext().getInitParameter("uploads") + File.separator;
@@ -205,7 +206,7 @@ public class ServletHelper {
             fileSaveDir.mkdirs();
         }
         Part filePart = request.getPart("attachFile");
-        String partFile = getFileName1(filePart);
+        String partFile = SysHelper.getFileName1(filePart);
         String fname = partFile.isEmpty() ?
                 request.getParameter("fName") :
                 partFile.substring(partFile.lastIndexOf("\\") + 1);
@@ -217,7 +218,7 @@ public class ServletHelper {
         if (!f.exists()) {
             filePart.write(uploadFilePath + fname);
             if (!partFile.isEmpty() && !request.getParameter("fName").isEmpty()) {
-                deleteAttach(uploadFilePath + request.getParameter("fName"));
+                SysHelper.deleteFile(uploadFilePath + request.getParameter("fName"));
                 LOGGER.info(request.getParameter("fName") + " is overrided!");
             }
             LOGGER.info(f.getName() + " is upload!");
@@ -232,51 +233,5 @@ public class ServletHelper {
             attach.setId(Long.parseLong(id));
         }
         return attach;
-    }
-
-    public String getFileExt(String fileName) {
-        String extension = "";
-        int i = fileName.lastIndexOf('.');
-        if (i > 0) {
-            extension = fileName.substring(i+1);
-        }
-        return extension;
-    }
-
-    public String getFileName(Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        String[] tokens = contentDisp.split(";");
-        for (String token : tokens) {
-            if (token.trim().startsWith("filename")) {
-                return token.substring(token.lastIndexOf("\\") + 1);
-            }
-        }
-        return "";
-    }
-
-    public String getFileName1(final Part part) {
-        final String partHeader = part.getHeader("content-disposition");
-        for (String content : part.getHeader("content-disposition").split(";")) {
-            if (content.trim().startsWith("filename")) {
-                return content.substring(
-                        content.indexOf('=') + 1).trim().replace("\"", "");
-            }
-        }
-        return null;
-    }
-
-    public void deleteAttach(String filename) {
-        try {
-            File file = new File(filename);
-            if (file.exists()) {
-                if (file.delete()) {
-                    LOGGER.info(file.getName() + " is deleted!");
-                } else {
-                    LOGGER.info("Delete operation is failed.");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
