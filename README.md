@@ -5,6 +5,9 @@ The purpose of the project - to understand how the servlets and JDBC working.
 
 Small Web application - work tasks and deadlines. Like a little Jira.
 
+- DBCP Connection Pooling (new);
+- Duplicated code in DAO is transferred to the parent AbstractDao class (new);
+- Own ResultSet mapper which build entity objects from ResultSet with help from Reflection API (new);
 - Only Java Servlets API and Java JDBC without any frameworks (to study how Servlets and jdbc working). Using jsp;
 - Dao factory template to easy working with many dao;
 - Use caching (use ehcache provider);
