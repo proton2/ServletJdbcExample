@@ -9,7 +9,6 @@ import com.java.servlets.util.SqlXmlReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +43,7 @@ public class WorkNoteDao extends AbstractDao {
     }
 
     @Override
-    public void updateItem(Model item) throws SQLException{
+    public void updateItem(Model item) throws SQLException {
         cacheRemove(item);
         WorkNote workNote = (WorkNote) item;
 
@@ -72,14 +71,16 @@ public class WorkNoteDao extends AbstractDao {
 
     @Override
     public WorkNote getById(Long itemId) {
-        WorkNote wn = (WorkNote)cacheGet(itemId);
-        if(wn != null) return wn;
+        WorkNote wn = (WorkNote) cacheGet(itemId);
+        if (wn != null) return wn;
 
         PreparedStatement ps = getNavigablePreparedStatement(getByIdSql);
         ResultSet rs = executeGetById(ps, itemId);
-        wn = (WorkNote) ResultSetMapper.staticMapRersultSetToObject(rs, WorkNote.class);
-        closeResultSet(ps, rs);
 
+        ResultSetMapper<WorkNote> resultSetMapper = new ResultSetMapper<>();
+        wn = resultSetMapper.mapRersultSetToObject(rs, WorkNote.class);
+
+        closeResultSet(ps, rs);
         cachePut(wn);
         return wn;
     }
@@ -91,13 +92,12 @@ public class WorkNoteDao extends AbstractDao {
 
     @Override
     public List<WorkNote> getListById(Long itemId) {
-        List<WorkNote> workNotes = new ArrayList<>();
         PreparedStatement ps = getNavigablePreparedStatement(getListById);
         ResultSet rs = executeGetById(ps, itemId);
-            while (resultSetNext(rs)) {
-                WorkNote wn = (WorkNote) ResultSetMapper.staticMapRersultSetToObject(rs, WorkNote.class);
-                workNotes.add(wn);
-            }
+
+        ResultSetMapper<WorkNote> resultSetMapper = new ResultSetMapper<>();
+        List<WorkNote> workNotes = resultSetMapper.mapRersultSetToList(rs, WorkNote.class);
+
         closeResultSet(ps, rs);
         return workNotes;
     }

@@ -40,7 +40,7 @@ public class UserDao extends AbstractDao {
     }
 
     @Override
-    public void updateItem(Model item) throws SQLException{
+    public void updateItem(Model item) throws SQLException {
         cacheRemove(item);
         User user = (User) item;
 
@@ -66,13 +66,15 @@ public class UserDao extends AbstractDao {
     @Override
     public User getById(Long userId) {
         User user = (User) cacheGet(userId);
-        if(user != null) return user;
+        if (user != null) return user;
 
         PreparedStatement ps = getNavigablePreparedStatement(getUserSql);
         ResultSet rs = executeGetById(ps, userId);
-        user = (User) ResultSetMapper.staticMapRersultSetToObject(rs, User.class);
-        closeResultSet(ps, rs);
 
+        ResultSetMapper<User> resultSetMapper = new ResultSetMapper<>();
+        user = resultSetMapper.mapRersultSetToObject(rs, User.class);
+
+        closeResultSet(ps, rs);
         cachePut(user);
         return user;
     }

@@ -1,6 +1,5 @@
 package com.java.servlets.dao.Service;
 
-import com.java.servlets.model.Model;
 import com.java.servlets.util.SysHelper;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -140,6 +139,7 @@ public class ResultSetMapper<T> {
         return outputObject;
     }
 
+    /*
     public static List<Model> staticMapRersultSetToList(ResultSet rs, Class outputClass) {
         List<Model> outputList = new ArrayList<>();
         try {
@@ -199,4 +199,5 @@ public class ResultSetMapper<T> {
         }
         return outputObject;
     }
+    */
 }

@@ -48,10 +48,12 @@ public class WorkTaskViewDao extends AbstractDao {
     }
 
     @Override
-    public void insertItem(Model item) throws SQLException {}
+    public void insertItem(Model item) throws SQLException {
+    }
 
     @Override
-    public void updateItem(Model item) throws SQLException {}
+    public void updateItem(Model item) throws SQLException {
+    }
 
     @Override
     public Long insert(Model item) {
@@ -59,10 +61,12 @@ public class WorkTaskViewDao extends AbstractDao {
     }
 
     @Override
-    public void update(Model item) {}
+    public void update(Model item) {
+    }
 
     @Override
-    public void delete(Long id) {}
+    public void delete(Long id) {
+    }
 
     @Override
     public WorkTaskView getById(Long itemId) {

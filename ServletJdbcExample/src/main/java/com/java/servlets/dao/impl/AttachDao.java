@@ -9,7 +9,6 @@ import com.java.servlets.util.SqlXmlReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +38,7 @@ public class AttachDao extends AbstractDao {
     }
 
     @Override
-    public void updateItem(Model item) throws SQLException{
+    public void updateItem(Model item) throws SQLException {
         Attach attach = (Attach) item;
 
         PreparedStatement ps = getPreparedStatement(updateSql);
@@ -63,13 +62,12 @@ public class AttachDao extends AbstractDao {
 
     @Override
     public List<Attach> getListById(Long itemId) {
-        List<Attach> attaches = new ArrayList<>();
         PreparedStatement ps = getNavigablePreparedStatement(getListById);
         ResultSet rs = executeGetById(ps, itemId);
-        while (resultSetNext(rs)) {
-            Attach attach = (Attach) ResultSetMapper.staticMapRersultSetToObject(rs, Attach.class);
-            attaches.add(attach);
-        }
+
+        ResultSetMapper<Attach> resultSetMapper = new ResultSetMapper<>();
+        List<Attach> attaches = resultSetMapper.mapRersultSetToList(rs, Attach.class);
+
         closeResultSet(ps, rs);
         return attaches;
     }
@@ -78,7 +76,10 @@ public class AttachDao extends AbstractDao {
     public Attach getById(Long itemId) {
         PreparedStatement ps = getNavigablePreparedStatement(getByIdSql);
         ResultSet rs = executeGetById(ps, itemId);
-        Attach attach = (Attach) ResultSetMapper.staticMapRersultSetToObject(rs, Attach.class);
+
+        ResultSetMapper<Attach> resultSetMapper = new ResultSetMapper<>();
+        Attach attach = resultSetMapper.mapRersultSetToObject(rs, Attach.class);
+
         closeResultSet(ps, rs);
         return attach;
     }

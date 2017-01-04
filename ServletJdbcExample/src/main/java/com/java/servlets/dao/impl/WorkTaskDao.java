@@ -43,7 +43,7 @@ public class WorkTaskDao extends AbstractDao {
     }
 
     @Override
-    public void updateItem(Model item) throws SQLException{
+    public void updateItem(Model item) throws SQLException {
         cacheRemove(item);
         WorkTask wt = (WorkTask) item;
 
@@ -68,13 +68,15 @@ public class WorkTaskDao extends AbstractDao {
     @Override
     public WorkTask getById(Long itemId) {
         WorkTask workTask = (WorkTask) cacheGet(itemId);
-        if(workTask != null) return workTask;
+        if (workTask != null) return workTask;
 
         PreparedStatement ps = getNavigablePreparedStatement(getById);
         ResultSet rs = executeGetById(ps, itemId);
-        workTask = (WorkTask) ResultSetMapper.staticMapRersultSetToObject(rs, WorkTask.class);
-        closeResultSet(ps, rs);
 
+        ResultSetMapper<WorkTask> resultSetMapper = new ResultSetMapper<>();
+        workTask = resultSetMapper.mapRersultSetToObject(rs, WorkTask.class);
+
+        closeResultSet(ps, rs);
         cachePut(workTask);
         return workTask;
     }
