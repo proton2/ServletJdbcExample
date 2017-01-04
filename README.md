@@ -8,9 +8,12 @@ Small Web application - work tasks and deadlines. Like a little Jira.
 - DBCP Connection Pooling (new);
 - Duplicated code in DAO is transferred to the parent AbstractDao class (new);
 - Own ResultSet mapper which build entity objects from ResultSet with help from Reflection API (new);
+- DBCP Connection Pooling;
+- Duplicated code in DAO is transferred to the parent AbstractDao class;
+- Own ResultSet mapper which build entity objects from ResultSet with help from Reflection API;
 - Only Java Servlets API and Java JDBC without any frameworks (to study how Servlets and jdbc working). Using jsp;
 - Dao factory template to easy working with many dao;
-- Use caching (use ehcache provider);
+- Use caching (use Ehcache provider);
 - Separation reading light objects for list froms and reading usual entities. Differents DAO;
 - Load SQL querries for dao from external xml file (to avoid changes in the source code if necessary change SQL querry);
 - authorization by password and different access rights depending on the user role;
