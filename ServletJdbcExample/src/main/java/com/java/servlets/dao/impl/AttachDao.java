@@ -2,9 +2,9 @@ package com.java.servlets.dao.impl;
 
 import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
+import com.java.servlets.dao.Service.SqlXmlReader;
 import com.java.servlets.model.Attach;
 import com.java.servlets.model.Model;
-import com.java.servlets.util.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,20 +15,12 @@ import java.util.List;
  * Created by proton2 on 05.11.2016.
  */
 public class AttachDao extends AbstractDao {
-    private String insertSql, updateSql, deleteSql, getListById, getByIdSql;
-
-    public AttachDao() {
-        SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("sql.xml", "AttachDao", "insertSql");
-        updateSql = sl.getQuerry("sql.xml", "AttachDao", "updateSql");
-        deleteSql = sl.getQuerry("sql.xml", "AttachDao", "deleteSql");
-        getListById = sl.getQuerry("sql.xml", "AttachDao", "getListById");
-        getByIdSql = sl.getQuerry("sql.xml", "AttachDao", "getByIdSql");
-    }
+    public AttachDao() {}
 
     @Override
     public void insertItem(Model item) throws SQLException {
         Attach attach = (Attach) item;
+        String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
         ps.setString(1, attach.getFileName());
         ps.setString(2, attach.getCaption());
@@ -40,7 +32,7 @@ public class AttachDao extends AbstractDao {
     @Override
     public void updateItem(Model item) throws SQLException {
         Attach attach = (Attach) item;
-
+        String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
         ps.setString(1, attach.getFileName());
         ps.setString(2, attach.getCaption());
@@ -52,6 +44,7 @@ public class AttachDao extends AbstractDao {
 
     @Override
     public void delete(Long id) {
+        String deleteSql = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "deleteSql");
         performDelete(id, deleteSql);
     }
 
@@ -62,6 +55,7 @@ public class AttachDao extends AbstractDao {
 
     @Override
     public List<Attach> getListById(Long itemId) {
+        String getListById = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "getListById");
         PreparedStatement ps = getNavigablePreparedStatement(getListById);
         ResultSet rs = executeGetById(ps, itemId);
 
@@ -74,6 +68,7 @@ public class AttachDao extends AbstractDao {
 
     @Override
     public Attach getById(Long itemId) {
+        String getByIdSql = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "getByIdSql");
         PreparedStatement ps = getNavigablePreparedStatement(getByIdSql);
         ResultSet rs = executeGetById(ps, itemId);
 

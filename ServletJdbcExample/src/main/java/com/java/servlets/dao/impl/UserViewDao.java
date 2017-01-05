@@ -4,7 +4,7 @@ import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.UserView;
-import com.java.servlets.util.SqlXmlReader;
+import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,12 +15,8 @@ import java.util.List;
  * Created by proton2 on 23.10.2016.
  */
 public class UserViewDao extends AbstractDao {
-    private String getAllSql;
 
-    public UserViewDao() {
-        SqlXmlReader sl = new SqlXmlReader();
-        getAllSql = sl.getQuerry("sql.xml", "UserViewDao", "getAllSql");
-    }
+    public UserViewDao() {}
 
     @Override
     public void insertItem(Model item) throws SQLException {
@@ -45,6 +41,7 @@ public class UserViewDao extends AbstractDao {
 
     @Override
     public List<UserView> getAll(int offcet, int limit) {
+        String getAllSql = SqlXmlReader.getQuerryStr("sql.xml", "UserViewDao", "getAllSql");
         PreparedStatement ps = getNavigablePreparedStatement(getAllSql);
         ResultSet rs = executeGetAll(ps);
 

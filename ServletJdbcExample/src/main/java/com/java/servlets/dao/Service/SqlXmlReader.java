@@ -1,4 +1,4 @@
-package com.java.servlets.util;
+package com.java.servlets.dao.Service;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,8 +20,8 @@ public class SqlXmlReader {
     public SqlXmlReader() {
     }
 
-    public String getQuerry(String fileName, String className, String querryName) {
-        ClassLoader classLoader = getClass().getClassLoader();
+    public static String getQuerryStr(String fileName, String className, String querryName) {
+        ClassLoader classLoader = SqlXmlReader.class.getClassLoader();
         File fXmlFile = new File(classLoader.getResource(fileName).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null;

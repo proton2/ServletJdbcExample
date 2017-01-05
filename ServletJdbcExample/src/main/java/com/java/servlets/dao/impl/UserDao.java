@@ -4,7 +4,7 @@ import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
-import com.java.servlets.util.SqlXmlReader;
+import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,19 +12,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UserDao extends AbstractDao {
-    private String insertSql, updateSql, deleteSql, getUserSql;
 
-    public UserDao() {
-        SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("sql.xml", "UserDao", "insertSql");
-        updateSql = sl.getQuerry("sql.xml", "UserDao", "updateSql");
-        deleteSql = sl.getQuerry("sql.xml", "UserDao", "deleteSql");
-        getUserSql = sl.getQuerry("sql.xml", "UserDao", "getUserSql");
-    }
+    public UserDao() {}
 
     @Override
     public void insertItem(Model item) throws SQLException {
         User user = (User) item;
+        String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
         ps.setString(1, user.getFirstName());
         ps.setString(2, user.getLastName());
@@ -43,7 +37,7 @@ public class UserDao extends AbstractDao {
     public void updateItem(Model item) throws SQLException {
         cacheRemove(item);
         User user = (User) item;
-
+        String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
         ps.setString(1, user.getFirstName());
         ps.setString(2, user.getLastName());
@@ -60,6 +54,7 @@ public class UserDao extends AbstractDao {
 
     @Override
     public void delete(Long id) {
+        String deleteSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "deleteSql");
         performDelete(id, deleteSql);
     }
 
@@ -68,6 +63,7 @@ public class UserDao extends AbstractDao {
         User user = (User) cacheGet(userId);
         if (user != null) return user;
 
+        String getUserSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "getUserSql");
         PreparedStatement ps = getNavigablePreparedStatement(getUserSql);
         ResultSet rs = executeGetById(ps, userId);
 

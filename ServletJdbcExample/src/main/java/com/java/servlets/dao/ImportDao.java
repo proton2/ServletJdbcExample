@@ -2,7 +2,7 @@ package com.java.servlets.dao;
 
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.util.DataSource;
-import com.java.servlets.util.SqlXmlReader;
+import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,17 +13,14 @@ import java.util.Collection;
  * Created by proton2 on 04.01.2017.
  */
 public class ImportDao {
-    private String insertSql;
 
-    public ImportDao(){
-        SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("sql.xml", "WorkTaskDao", "insertSql");
-    }
+    public ImportDao(){}
 
     public int importCollection(Collection<WorkTask> workTaskList){
         Connection connection = DataSource.getInstance().getConnection();
         PreparedStatement ps = null;
         int[] updateCounts = null;
+        String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "insertSql");
         if (workTaskList!=null && !workTaskList.isEmpty()) {
             try {
                 connection.setAutoCommit(false);

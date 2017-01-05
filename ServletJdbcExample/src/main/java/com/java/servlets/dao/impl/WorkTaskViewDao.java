@@ -4,7 +4,7 @@ import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.WorkTaskView;
-import com.java.servlets.util.SqlXmlReader;
+import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,16 +15,12 @@ import java.util.List;
  * Created by proton2 on 23.10.2016.
  */
 public class WorkTaskViewDao extends AbstractDao {
-    private String getAllSql, getUserWorkTasks;
 
-    public WorkTaskViewDao() {
-        SqlXmlReader sl = new SqlXmlReader();
-        getAllSql = sl.getQuerry("sql.xml", "WorkTaskViewDao", "getall");
-        getUserWorkTasks = sl.getQuerry("sql.xml", "WorkTaskViewDao", "getUserWorkTasks");
-    }
+    public WorkTaskViewDao() {}
 
     @Override
     public List<WorkTaskView> getAll(int offset, int limit) {
+        String getAllSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskViewDao", "getall");
         PreparedStatement ps = getNavigablePreparedStatement(getAllSql);
         ResultSet rs = executeGetAll(ps, offset, limit);
 
@@ -37,6 +33,7 @@ public class WorkTaskViewDao extends AbstractDao {
 
     @Override
     public List<WorkTaskView> getListById(Long itemId) {
+        String getUserWorkTasks = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskViewDao", "getUserWorkTasks");
         PreparedStatement ps = getNavigablePreparedStatement(getUserWorkTasks);
         ResultSet rs = executeGetById(ps, itemId);
 

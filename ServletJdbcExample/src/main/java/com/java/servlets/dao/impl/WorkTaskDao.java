@@ -4,7 +4,7 @@ import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.WorkTask;
-import com.java.servlets.util.SqlXmlReader;
+import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,20 +15,14 @@ import java.util.List;
  * Created by proton2 on 06.08.2016.
  */
 public class WorkTaskDao extends AbstractDao {
-    private String insertSql, updateSql, deleteSql, getById;
 
-    public WorkTaskDao() {
-        SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("sql.xml", "WorkTaskDao", "insertSql");
-        updateSql = sl.getQuerry("sql.xml", "WorkTaskDao", "updateSql");
-        deleteSql = sl.getQuerry("sql.xml", "WorkTaskDao", "deleteSql");
-        getById = sl.getQuerry("sql.xml", "WorkTaskDao", "getById");
-    }
+    public WorkTaskDao() {}
 
     @Override
     public void insertItem(Model item) throws SQLException {
         WorkTask workTask = (WorkTask) item;
 
+        String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
         ps.setLong(1, workTask.getTaskUser().getId());
         ps.setString(2, workTask.getCaption());
@@ -47,6 +41,7 @@ public class WorkTaskDao extends AbstractDao {
         cacheRemove(item);
         WorkTask wt = (WorkTask) item;
 
+        String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
         ps.setLong(1, wt.getTaskUser().getId());
         ps.setString(2, wt.getCaption());
@@ -62,6 +57,7 @@ public class WorkTaskDao extends AbstractDao {
 
     @Override
     public void delete(Long id) {
+        String deleteSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "deleteSql");
         performDelete(id, deleteSql);
     }
 
@@ -70,6 +66,7 @@ public class WorkTaskDao extends AbstractDao {
         WorkTask workTask = (WorkTask) cacheGet(itemId);
         if (workTask != null) return workTask;
 
+        String getById = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "getById");
         PreparedStatement ps = getNavigablePreparedStatement(getById);
         ResultSet rs = executeGetById(ps, itemId);
 

@@ -4,7 +4,7 @@ import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.WorkNote;
-import com.java.servlets.util.SqlXmlReader;
+import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,21 +15,14 @@ import java.util.List;
  * Created by proton2 on 21.11.2016.
  */
 public class WorkNoteDao extends AbstractDao {
-    private String insertSql, updateSql, deleteSql, getByIdSql, getListById;
 
-    public WorkNoteDao() {
-        SqlXmlReader sl = new SqlXmlReader();
-        insertSql = sl.getQuerry("sql.xml", "WorkNoteDao", "insertSql");
-        updateSql = sl.getQuerry("sql.xml", "WorkNoteDao", "updateSql");
-        deleteSql = sl.getQuerry("sql.xml", "WorkNoteDao", "deleteSql");
-        getByIdSql = sl.getQuerry("sql.xml", "WorkNoteDao", "getByIdSql");
-        getListById = sl.getQuerry("sql.xml", "WorkNoteDao", "getListById");
-    }
+    public WorkNoteDao() {}
 
     @Override
     public void insertItem(Model item) throws SQLException {
         WorkNote workNote = (WorkNote) item;
 
+        String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
         ps.setString(1, workNote.getCaption());
         ps.setDate(2, new java.sql.Date(workNote.getNoteDate().getTime()));
@@ -47,6 +40,7 @@ public class WorkNoteDao extends AbstractDao {
         cacheRemove(item);
         WorkNote workNote = (WorkNote) item;
 
+        String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
         ps.setString(1, workNote.getCaption());
         ps.setDate(2, new java.sql.Date(workNote.getNoteDate().getTime()));
@@ -61,6 +55,7 @@ public class WorkNoteDao extends AbstractDao {
 
     @Override
     public void delete(Long id) {
+        String deleteSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "deleteSql");
         performDelete(id, deleteSql);
     }
 
@@ -74,6 +69,7 @@ public class WorkNoteDao extends AbstractDao {
         WorkNote wn = (WorkNote) cacheGet(itemId);
         if (wn != null) return wn;
 
+        String getByIdSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "getByIdSql");
         PreparedStatement ps = getNavigablePreparedStatement(getByIdSql);
         ResultSet rs = executeGetById(ps, itemId);
 
@@ -92,6 +88,7 @@ public class WorkNoteDao extends AbstractDao {
 
     @Override
     public List<WorkNote> getListById(Long itemId) {
+        String getListById = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "getListById");
         PreparedStatement ps = getNavigablePreparedStatement(getListById);
         ResultSet rs = executeGetById(ps, itemId);
 

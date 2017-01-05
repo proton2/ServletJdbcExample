@@ -119,9 +119,11 @@ public class ResultSetMapper<T> {
                                 SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null &&
                                 BeanUtils.getProperty(bean, field.getName()) == null)
                         {
-                            Map<String, Object> rewrMap = prepareSubclassQuerryFields(field, currMap);
-                            List<Field> newsFields = prepareSubclassReflectionFields(field.getType(), rewrMap.keySet());
-                            BeanUtils.setProperty(bean, field.getName(), mapRersultSetToObject(field.getType(), rewrMap, newsFields));
+                            Map<String, Object> subclassResultSet = prepareSubclassQuerryFields(field, currMap);
+                            if(!subclassResultSet.isEmpty()) {
+                                List<Field> subclassFields = prepareSubclassReflectionFields(field.getType(), subclassResultSet.keySet());
+                                BeanUtils.setProperty(bean, field.getName(), mapRersultSetToObject(field.getType(), subclassResultSet, subclassFields));
+                            }
                         }
                         else if (field.getType().isEnum() && BeanUtils.getProperty(bean, field.getName()) == null &&
                                 SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
