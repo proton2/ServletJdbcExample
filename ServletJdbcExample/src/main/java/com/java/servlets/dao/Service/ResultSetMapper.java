@@ -67,6 +67,18 @@ public class ResultSetMapper<T> {
         return readyFields;
     }
 
+    private static boolean checkIsPrimitive(Class<?>clazz){
+        if (clazz.isAssignableFrom(java.util.Date.class) ||
+                (clazz.getSuperclass()!=null && clazz.getSuperclass().isAssignableFrom(Number.class)) || //Collection
+                clazz.isAssignableFrom(String.class) ||
+                clazz.isAssignableFrom(Character.class) ||
+                clazz.isAssignableFrom(Boolean.class))
+        {
+            return true;
+        }
+        return false;
+    }
+
     private static Map<String, Object> prepareSubclassQuerryFields(Field field, Map<String, Object> currMap) {
         Map<String, Object> newMap = new HashMap();
         for (Map.Entry<String, Object> entry : currMap.entrySet()) {
@@ -115,9 +127,8 @@ public class ResultSetMapper<T> {
                             BeanUtils.setProperty(bean, field.getName(), columnValue);
                             break;
                         }
-                        else if (field.getType().getSuperclass() != null && field.getType().getSuperclass().getName().equals(outputClass.getSuperclass().getName()) &&
-                                SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null &&
-                                BeanUtils.getProperty(bean, field.getName()) == null)
+                        else if (!checkIsPrimitive(field.getType()) && BeanUtils.getProperty(bean, field.getName()) == null &&
+                                SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
                         {
                             Map<String, Object> subclassResultSet = prepareSubclassQuerryFields(field, currMap);
                             if(!subclassResultSet.isEmpty()) {
