@@ -106,8 +106,7 @@ public class ResultSetMapper<T> {
     }
 
     public T mapRersultSetToObject(ResultSet rs, Class outputClass) {
-        Map<String, Object> newMap = copyResultSetToMap(rs);
-        return mapRersultSetToObject(outputClass, newMap, getAllFields(outputClass));
+        return mapRersultSetToObject(outputClass, copyResultSetToMap(rs), getAllFields(outputClass));
     }
 
     public T mapRersultSetToObject(Class outputClass, Map<String, Object> currMap, List<Field> fields) {
