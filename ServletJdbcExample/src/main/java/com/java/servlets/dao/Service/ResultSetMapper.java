@@ -39,11 +39,11 @@ public class ResultSetMapper<T> {
         return resultMap;
     }
 
-    public static List<Field> getAllFields(List<Field> fields, Class<?> type, Set<String> nessesaryFields) {
-
+    public static List<Field> getAllFields(Class<?> type) {
+        List<Field> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(type.getDeclaredFields()));
-        if (type.getSuperclass() != null) {
-            fields = getAllFields(fields, type.getSuperclass(), nessesaryFields);
+        if (type.getSuperclass() != null && type.getSuperclass() != Object.class) {
+            fields.addAll(getAllFields(type.getSuperclass()));
         }
         return fields;
     }
@@ -67,16 +67,17 @@ public class ResultSetMapper<T> {
         return readyFields;
     }
 
-    private static boolean checkIsPrimitive(Class<?>clazz){
-        if (clazz.isAssignableFrom(java.util.Date.class) ||
+    private static boolean checkIsSubclass(Class<?>clazz){
+        if (clazz.isEnum() ||
+                clazz.isAssignableFrom(java.util.Date.class) ||
                 (clazz.getSuperclass()!=null && clazz.getSuperclass().isAssignableFrom(Number.class)) || //Collection
                 clazz.isAssignableFrom(String.class) ||
                 clazz.isAssignableFrom(Character.class) ||
                 clazz.isAssignableFrom(Boolean.class))
         {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private static Map<String, Object> prepareSubclassQuerryFields(Field field, Map<String, Object> currMap) {
@@ -106,9 +107,7 @@ public class ResultSetMapper<T> {
 
     public T mapRersultSetToObject(ResultSet rs, Class outputClass) {
         Map<String, Object> newMap = copyResultSetToMap(rs);
-        ArrayList<Field> fields = new ArrayList<>();
-        getAllFields(fields, outputClass, newMap.keySet());
-        return mapRersultSetToObject(outputClass, newMap, fields);
+        return mapRersultSetToObject(outputClass, newMap, getAllFields(outputClass));
     }
 
     public T mapRersultSetToObject(Class outputClass, Map<String, Object> currMap, List<Field> fields) {
@@ -127,7 +126,13 @@ public class ResultSetMapper<T> {
                             BeanUtils.setProperty(bean, field.getName(), columnValue);
                             break;
                         }
-                        else if (!checkIsPrimitive(field.getType()) && BeanUtils.getProperty(bean, field.getName()) == null &&
+                        else if (field.getType().isEnum() && BeanUtils.getProperty(bean, field.getName()) == null &&
+                                SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
+                        {
+                            Class clazz = field.getType();
+                            BeanUtils.setProperty(bean, field.getName(), Enum.valueOf(clazz, columnValue.toString()));
+                        }
+                        else if (checkIsSubclass(field.getType()) && BeanUtils.getProperty(bean, field.getName()) == null &&
                                 SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
                         {
                             Map<String, Object> subclassResultSet = prepareSubclassQuerryFields(field, currMap);
@@ -135,12 +140,6 @@ public class ResultSetMapper<T> {
                                 List<Field> subclassFields = prepareSubclassReflectionFields(field.getType(), subclassResultSet.keySet());
                                 BeanUtils.setProperty(bean, field.getName(), mapRersultSetToObject(field.getType(), subclassResultSet, subclassFields));
                             }
-                        }
-                        else if (field.getType().isEnum() && BeanUtils.getProperty(bean, field.getName()) == null &&
-                                SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
-                        {
-                            Class clazz = field.getType();
-                            BeanUtils.setProperty(bean, field.getName(), Enum.valueOf(clazz, columnValue.toString()));
                         }
                     }
                 }
