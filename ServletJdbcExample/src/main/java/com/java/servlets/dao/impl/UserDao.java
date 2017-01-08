@@ -20,10 +20,7 @@ public class UserDao extends AbstractDao {
         User user = (User) item;
         String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
-
-        ResultSetMapper<User> resultSetMapper = new ResultSetMapper<>();
-        resultSetMapper.putEntityToPreparedStatement(ps, user);
-
+        ResultSetMapper.putEntityToPreparedStatement(ps, user);
         executeUpdate(ps);
 
         user.setId(getInsertId("usertable"));
@@ -36,10 +33,7 @@ public class UserDao extends AbstractDao {
         User user = (User) item;
         String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
-
-        ResultSetMapper<User> resultSetMapper = new ResultSetMapper<>();
-        resultSetMapper.putEntityToPreparedStatement(ps, user);
-
+        ResultSetMapper.putEntityToPreparedStatement(ps, user);
         executeUpdate(ps);
         cachePut(user);
     }

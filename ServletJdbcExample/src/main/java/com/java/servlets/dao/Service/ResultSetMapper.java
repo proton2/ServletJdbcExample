@@ -151,7 +151,7 @@ public class ResultSetMapper<T> {
         return outputObject;
     }
 
-    public void putEntityToPreparedStatement(PreparedStatement ps, Object entity){
+    public static void putEntityToPreparedStatement(PreparedStatement ps, Object entity){
         List<Field> fields = getAllFields(entity.getClass());
         int i=0;
         try {

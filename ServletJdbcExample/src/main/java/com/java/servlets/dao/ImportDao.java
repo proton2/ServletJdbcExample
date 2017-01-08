@@ -1,7 +1,7 @@
 package com.java.servlets.dao;
 
 import com.java.servlets.model.WorkTask;
-import com.java.servlets.util.DataSource;
+import com.java.servlets.dao.Service.DataSource;
 import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.Connection;

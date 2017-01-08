@@ -24,10 +24,7 @@ public class WorkTaskDao extends AbstractDao {
 
         String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
-
-        ResultSetMapper<WorkTask> resultSetMapper = new ResultSetMapper<>();
-        resultSetMapper.putEntityToPreparedStatement(ps, workTask);
-
+        ResultSetMapper.putEntityToPreparedStatement(ps, workTask);
         executeUpdate(ps);
 
         workTask.setId(getInsertId("WorkTask"));
@@ -41,9 +38,7 @@ public class WorkTaskDao extends AbstractDao {
 
         String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
-
-        ResultSetMapper<WorkTask> resultSetMapper = new ResultSetMapper<>();
-        resultSetMapper.putEntityToPreparedStatement(ps, workTask);
+        ResultSetMapper.putEntityToPreparedStatement(ps, workTask);
 
         executeUpdate(ps);
         cachePut(workTask);

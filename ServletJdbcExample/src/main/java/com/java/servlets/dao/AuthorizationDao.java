@@ -1,7 +1,7 @@
 package com.java.servlets.dao;
 
 import com.java.servlets.model.UserRole;
-import com.java.servlets.util.DataSource;
+import com.java.servlets.dao.Service.DataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

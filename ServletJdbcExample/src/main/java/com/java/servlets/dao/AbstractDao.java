@@ -1,7 +1,7 @@
 package com.java.servlets.dao;
 
 import com.java.servlets.model.Model;
-import com.java.servlets.util.DataSource;
+import com.java.servlets.dao.Service.DataSource;
 import com.java.servlets.util.EHCacheManger;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;

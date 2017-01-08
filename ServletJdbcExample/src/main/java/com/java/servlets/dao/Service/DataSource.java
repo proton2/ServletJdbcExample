@@ -1,4 +1,4 @@
-package com.java.servlets.util;
+package com.java.servlets.dao.Service;
 
 import org.apache.commons.dbcp.BasicDataSource;
 

@@ -24,10 +24,7 @@ public class WorkNoteDao extends AbstractDao {
 
         String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
-
-        ResultSetMapper<WorkNote> resultSetMapper = new ResultSetMapper<>();
-        resultSetMapper.putEntityToPreparedStatement(ps, workNote);
-
+        ResultSetMapper.putEntityToPreparedStatement(ps, workNote);
         executeUpdate(ps);
 
         workNote.setId(getInsertId("WorkNote"));
@@ -38,13 +35,9 @@ public class WorkNoteDao extends AbstractDao {
     public void updateItem(Model item) throws SQLException {
         cacheRemove(item);
         WorkNote workNote = (WorkNote) item;
-
         String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkNoteDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
-
-        ResultSetMapper<WorkNote> resultSetMapper = new ResultSetMapper<>();
-        resultSetMapper.putEntityToPreparedStatement(ps, workNote);
-
+        ResultSetMapper.putEntityToPreparedStatement(ps, workNote);
         executeUpdate(ps);
         cachePut(workNote);
     }
