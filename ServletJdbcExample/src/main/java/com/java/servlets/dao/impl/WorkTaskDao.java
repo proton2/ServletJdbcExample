@@ -24,12 +24,10 @@ public class WorkTaskDao extends AbstractDao {
 
         String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
-        ps.setLong(1, workTask.getTaskUser().getId());
-        ps.setString(2, workTask.getCaption());
-        ps.setString(3, workTask.getTaskContext());
-        ps.setDate(4, new java.sql.Date(workTask.getTaskDate().getTime()));
-        ps.setDate(5, new java.sql.Date(workTask.getDeadLine().getTime()));
-        ps.setString(6, workTask.getTaskStatus().name());
+
+        ResultSetMapper<WorkTask> resultSetMapper = new ResultSetMapper<>();
+        resultSetMapper.putEntityToPreparedStatement(ps, workTask);
+
         executeUpdate(ps);
 
         workTask.setId(getInsertId("WorkTask"));
@@ -39,20 +37,16 @@ public class WorkTaskDao extends AbstractDao {
     @Override
     public void updateItem(Model item) throws SQLException {
         cacheRemove(item);
-        WorkTask wt = (WorkTask) item;
+        WorkTask workTask = (WorkTask) item;
 
         String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
-        ps.setLong(1, wt.getTaskUser().getId());
-        ps.setString(2, wt.getCaption());
-        ps.setString(3, wt.getTaskContext());
-        ps.setDate(4, new java.sql.Date(wt.getTaskDate().getTime()));
-        ps.setDate(5, new java.sql.Date(wt.getDeadLine().getTime()));
-        ps.setString(6, wt.getTaskStatus().name());
-        ps.setLong(7, item.getId());
+
+        ResultSetMapper<WorkTask> resultSetMapper = new ResultSetMapper<>();
+        resultSetMapper.putEntityToPreparedStatement(ps, workTask);
 
         executeUpdate(ps);
-        cachePut(wt);
+        cachePut(workTask);
     }
 
     @Override

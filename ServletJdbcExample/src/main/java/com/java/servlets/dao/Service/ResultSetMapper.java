@@ -5,6 +5,7 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -148,6 +149,30 @@ public class ResultSetMapper<T> {
             e.printStackTrace();
         }
         return outputObject;
+    }
+
+    public void putEntityToPreparedStatement(PreparedStatement ps, Object entity){
+        List<Field> fields = getAllFields(entity.getClass());
+        int i=0;
+        try {
+            for (Field field : fields) {
+                i++;
+                field.setAccessible(true);
+                Object entityField = field.get(entity);
+                if (entityField==null){
+                    i--;
+                    continue;
+                }
+                int type = ps.getParameterMetaData().getParameterType(i);
+                if (checkIsSubclass(entityField.getClass())){
+                    ps.setObject(i, Long.parseLong(BeanUtils.getProperty(entityField, "id")), type);
+                } else {
+                    ps.setObject(i, entityField, type);
+                }
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | SQLException | IllegalAccessException e) {
+                e.printStackTrace();
+        }
     }
 
     /*

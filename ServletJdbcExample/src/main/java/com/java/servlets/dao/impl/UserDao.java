@@ -2,9 +2,9 @@ package com.java.servlets.dao.impl;
 
 import com.java.servlets.dao.AbstractDao;
 import com.java.servlets.dao.Service.ResultSetMapper;
+import com.java.servlets.dao.Service.SqlXmlReader;
 import com.java.servlets.model.Model;
 import com.java.servlets.model.User;
-import com.java.servlets.dao.Service.SqlXmlReader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,13 +20,10 @@ public class UserDao extends AbstractDao {
         User user = (User) item;
         String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
-        ps.setString(1, user.getFirstName());
-        ps.setString(2, user.getLastName());
-        ps.setString(3, user.getCaption());
-        ps.setString(4, user.getEmail());
-        ps.setString(5, user.getLogin());
-        ps.setString(6, user.getPassword());
-        ps.setString(7, user.getRole().name());
+
+        ResultSetMapper<User> resultSetMapper = new ResultSetMapper<>();
+        resultSetMapper.putEntityToPreparedStatement(ps, user);
+
         executeUpdate(ps);
 
         user.setId(getInsertId("usertable"));
@@ -39,14 +36,9 @@ public class UserDao extends AbstractDao {
         User user = (User) item;
         String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "UserDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
-        ps.setString(1, user.getFirstName());
-        ps.setString(2, user.getLastName());
-        ps.setString(3, user.getCaption());
-        ps.setString(4, user.getEmail());
-        ps.setString(5, user.getLogin());
-        ps.setString(6, user.getPassword());
-        ps.setString(7, user.getRole().name());
-        ps.setLong(8, user.getId());
+
+        ResultSetMapper<User> resultSetMapper = new ResultSetMapper<>();
+        resultSetMapper.putEntityToPreparedStatement(ps, user);
 
         executeUpdate(ps);
         cachePut(user);

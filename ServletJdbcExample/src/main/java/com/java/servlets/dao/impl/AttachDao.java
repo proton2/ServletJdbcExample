@@ -22,9 +22,10 @@ public class AttachDao extends AbstractDao {
         Attach attach = (Attach) item;
         String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "insertSql");
         PreparedStatement ps = getPreparedStatement(insertSql);
-        ps.setString(1, attach.getFileName());
-        ps.setString(2, attach.getCaption());
-        ps.setLong(3, attach.getWorkTask().getId());
+
+        ResultSetMapper<Attach> resultSetMapper = new ResultSetMapper<>();
+        resultSetMapper.putEntityToPreparedStatement(ps, attach);
+
         executeUpdate(ps);
         attach.setId(getInsertId("attach"));
     }
@@ -34,10 +35,9 @@ public class AttachDao extends AbstractDao {
         Attach attach = (Attach) item;
         String updateSql = SqlXmlReader.getQuerryStr("sql.xml", "AttachDao", "updateSql");
         PreparedStatement ps = getPreparedStatement(updateSql);
-        ps.setString(1, attach.getFileName());
-        ps.setString(2, attach.getCaption());
-        ps.setLong(3, attach.getWorkTask().getId());
-        ps.setLong(4, attach.getId());
+
+        ResultSetMapper<Attach> resultSetMapper = new ResultSetMapper<>();
+        resultSetMapper.putEntityToPreparedStatement(ps, attach);
 
         executeUpdate(ps);
     }
