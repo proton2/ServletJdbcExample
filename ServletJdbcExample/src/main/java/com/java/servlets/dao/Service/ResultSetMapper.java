@@ -40,7 +40,7 @@ public class ResultSetMapper<T> {
         return resultMap;
     }
 
-    public static List<Field> getAllFields(Class<?> type) {
+    private static List<Field> getAllFields(Class<?> type) {
         List<Field> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(type.getDeclaredFields()));
         if (type.getSuperclass() != null && type.getSuperclass() != Object.class) {
@@ -49,7 +49,7 @@ public class ResultSetMapper<T> {
         return fields;
     }
 
-    public static List<Field> prepareSubclassReflectionFields(Class<?> type, Set<String> nessesaryFields) {
+    private static List<Field> prepareSubclassReflectionFields(Class<?> type, Set<String> nessesaryFields) {
         List<Field> fields1 = new ArrayList<>();
         fields1.addAll(Arrays.asList(type.getDeclaredFields()));
         if (type.getSuperclass() != null && type.getSuperclass() != Object.class) {
@@ -93,7 +93,7 @@ public class ResultSetMapper<T> {
         return newMap;
     }
 
-    public List<T> mapRersultSetToList(ResultSet rs, Class outputClass) {
+    public List<T> mapRersultSetToList(ResultSet rs, Class<T> outputClass) {
         List<T> outputList = new ArrayList<T>();
         try {
             while (rs.next()){
@@ -106,11 +106,11 @@ public class ResultSetMapper<T> {
         return outputList;
     }
 
-    public T mapRersultSetToObject(ResultSet rs, Class outputClass) {
+    public T mapRersultSetToObject(ResultSet rs, Class<T> outputClass) {
         return mapRersultSetToObject(outputClass, copyResultSetToMap(rs), getAllFields(outputClass));
     }
 
-    public T mapRersultSetToObject(Class outputClass, Map<String, Object> currMap, List<Field> fields) {
+    private T mapRersultSetToObject(Class outputClass, Map<String, Object> currMap, List<Field> fields) {
         T outputObject = null;
         try {
             if (!currMap.isEmpty()) {
@@ -130,7 +130,13 @@ public class ResultSetMapper<T> {
                                 SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
                         {
                             Class clazz = field.getType();
-                            BeanUtils.setProperty(bean, field.getName(), Enum.valueOf(clazz, columnValue.toString()));
+                            Enum val = null;
+                            if (columnValue.getClass().equals(Integer.class)) {
+                                val = (Enum) clazz.getEnumConstants()[(Integer)columnValue];
+                            } else if (columnValue.getClass().equals(String.class)) {
+                                val = Enum.valueOf(clazz, (String)columnValue);
+                            }
+                            BeanUtils.setProperty(bean, field.getName(), val);
                         }
                         else if (checkIsSubclass(field.getType()) && BeanUtils.getProperty(bean, field.getName()) == null &&
                                 SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
