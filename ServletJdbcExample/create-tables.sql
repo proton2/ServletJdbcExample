@@ -9,6 +9,12 @@ CREATE SEQUENCE public.hibernate_sequence
 ALTER TABLE public.hibernate_sequence
   OWNER TO postgres;
 
+create table if not exists public.detail (
+	id bigint not null default nextval('hibernate_sequence'::regclass),
+	notice varchar(255),
+	CONSTRAINT detailpk PRIMARY KEY (id)
+);
+
 create table if not exists public.usertable (
 	id bigint not null default nextval('hibernate_sequence'::regclass),
 	caption varchar(255),
@@ -18,7 +24,12 @@ create table if not exists public.usertable (
 	login varchar(255) UNIQUE,
 	password varchar(255),
 	role_id varchar(64),
-	CONSTRAINT usertablepk PRIMARY KEY (id)
+	detail_id bigint,
+	CONSTRAINT usertablepk PRIMARY KEY (id),
+
+	CONSTRAINT fk_detail_id_key FOREIGN KEY (detail_id)
+      REFERENCES public.detail (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 create table if not exists public.worktask(
@@ -63,30 +74,34 @@ create table if not exists public.WorkNote (
         ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru', 'stx1', '222', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru', 'vpt', '333', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru', 'ast', '444', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru', 'test1', '555', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru', 'test2', '666', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru', 'admin-gr', '777', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru', 'gr-1', '888', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru', 'gr-2', '999', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru', 'gr-3', '101', 'user');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru', 'lead', '102', 'boss');
-insert into public.usertable (caption, firstname, lastname, email, login, password, role_id) values
-('administrator', 'Admin', 'Admin', 'admin@mycomp.ru', 'root', 'root', 'admin');
+insert into public.detail (notice) values ('value 1');
+insert into public.detail (notice) values ('value 2');
+insert into public.detail (notice) values ('value 3');
+
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('visitor', 'Vasili', 'Petrov', 'vtd@mycomp.ru', 'vtd', '111', 'user', (select id from detail where notice = 'value 1'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('guest', 'Sergey', 'Storogev', 'stx1@mycomp.ru', 'stx1', '222', 'user', (select id from detail where notice = 'value 2'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('product manager', 'Alexey', 'Vasin', 'vpt@mycomp.ru', 'vpt', '333', 'user', (select id from detail where notice = 'value 3'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('assistant', 'Elena', 'Kononova', 'ast@mycomp.ru', 'ast', '444', 'user', (select id from detail where notice = 'value 1'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('tester', 'Valentina', 'Sokolova', 'test1@mycomp.ru', 'test1', '555', 'user', (select id from detail where notice = 'value 2'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('tester', 'Tatiana', 'Smirnova', 'test2@mycomp.ru', 'test2', '666', 'user', (select id from detail where notice = 'value 3'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('admin', 'Stanislav', 'Dolgih', 'admin-gr@mycomp.ru', 'admin-gr', '777', 'user', (select id from detail where notice = 'value 1'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('programmer', 'Evgeniy', 'Stepanov', 'gr-1@mycomp.ru', 'gr-1', '888', 'user', (select id from detail where notice = 'value 2'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('programmer', 'Mihail', 'Vasilkov', 'gr-2@mycomp.ru', 'gr-2', '999', 'user', (select id from detail where notice = 'value 3'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('programmer', 'Oleg', 'Efremov', 'gr-3@mycomp.ru', 'gr-3', '101', 'user', (select id from detail where notice = 'value 1'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('lead', 'Vladimir', 'Ogarev', 'lead@mycomp.ru', 'lead', '102', 'boss', (select id from detail where notice = 'value 2'));
+insert into public.usertable (caption, firstname, lastname, email, login, password, role_id, detail_id) values
+('administrator', 'Admin', 'Admin', 'admin@mycomp.ru', 'root', 'root', 'admin', (select id from detail where notice = 'value 3'));
 
 insert into public.worktask (caption, taskdate, deadline, taskcontext, taskuser_id, taskstatus_id) values
 ('Test task', '04.09.2016', '05.09.2016', 'test current build', (select id from usertable where usertable.email='test2@mycomp.ru'), 'NEW');

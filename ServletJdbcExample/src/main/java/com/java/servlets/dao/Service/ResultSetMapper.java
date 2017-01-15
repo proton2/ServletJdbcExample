@@ -55,17 +55,7 @@ public class ResultSetMapper<T> {
         if (type.getSuperclass() != null && type.getSuperclass() != Object.class) {
             fields1.addAll(prepareSubclassReflectionFields(type.getSuperclass(), nessesaryFields));
         }
-
-        List<Field> readyFields = new ArrayList<>();
-        for (Field f : fields1) {
-            for (String nessesaryName : nessesaryFields) {
-                if (SysHelper.getFieldNameFromAlias(nessesaryName).equalsIgnoreCase(f.getName())) {
-                    readyFields.add(f);
-                }
-            }
-        }
-
-        return readyFields;
+        return fields1;
     }
 
     private static boolean checkIsSubclass(Class<?>clazz){
@@ -88,6 +78,8 @@ public class ResultSetMapper<T> {
             if (SysHelper.getClassNameFromAlias(name).equalsIgnoreCase(field.getName())) {
                 String newKey = SysHelper.getFileExt(field.getType().getName()) + "_" + SysHelper.getFieldNameFromAlias(name);
                 newMap.put(newKey, entry.getValue());
+            } else if (entry.getValue()!=null){
+                newMap.put(name, entry.getValue());
             }
         }
         return newMap;
@@ -124,6 +116,7 @@ public class ResultSetMapper<T> {
                                 BeanUtils.getProperty(bean, field.getName()) == null)
                         {
                             BeanUtils.setProperty(bean, field.getName(), columnValue);
+                            currMap.put(columnName, null);
                             break;
                         }
                         else if (field.getType().isEnum() && BeanUtils.getProperty(bean, field.getName()) == null &&
@@ -137,6 +130,8 @@ public class ResultSetMapper<T> {
                                 val = Enum.valueOf(clazz, (String)columnValue);
                             }
                             BeanUtils.setProperty(bean, field.getName(), val);
+                            currMap.put(columnName, null);
+                            break;
                         }
                         else if (checkIsSubclass(field.getType()) && BeanUtils.getProperty(bean, field.getName()) == null &&
                                 SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
@@ -145,6 +140,8 @@ public class ResultSetMapper<T> {
                             if(!subclassResultSet.isEmpty()) {
                                 List<Field> subclassFields = prepareSubclassReflectionFields(field.getType(), subclassResultSet.keySet());
                                 BeanUtils.setProperty(bean, field.getName(), mapRersultSetToObject(field.getType(), subclassResultSet, subclassFields));
+                                currMap.put(columnName, null);
+                                break;
                             }
                         }
                     }
@@ -180,66 +177,4 @@ public class ResultSetMapper<T> {
                 e.printStackTrace();
         }
     }
-
-    /*
-    public static List<Model> staticMapRersultSetToList(ResultSet rs, Class outputClass) {
-        List<Model> outputList = new ArrayList<>();
-        try {
-            while (rs.next()){
-                outputList.add(staticMapRersultSetToObject(rs, outputClass));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return outputList;
-    }
-
-    public static Model staticMapRersultSetToObject(ResultSet rs, Class outputClass) {
-        Map<String, Object> newMap = copyResultSetToMap(rs);
-        ArrayList<Field> fields = new ArrayList<>();
-        getAllFields(fields, outputClass, newMap.keySet());
-        return staticMapRersultSetToObject(outputClass, newMap, fields);
-    }
-
-    public static Model staticMapRersultSetToObject(Class outputClass, Map<String, Object> currMap, List<Field> fields) {
-        Model outputObject = null;
-        try {
-            if (!currMap.isEmpty()) {
-                Model bean = (Model) outputClass.newInstance();
-                for (Map.Entry<String, Object> entry : currMap.entrySet()) {
-                    String columnName = entry.getKey();
-                    Object columnValue = entry.getValue();
-                    for (Field field : fields) {
-                        if (SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(SysHelper.getFileExt(outputClass.getName())) &&
-                                SysHelper.getFieldNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null &&
-                                BeanUtils.getProperty(bean, field.getName()) == null)
-                        {
-                            BeanUtils.setProperty(bean, field.getName(), columnValue);
-                            break;
-                        }
-                        else if (field.getType().getSuperclass() != null && field.getType().getSuperclass().getName().equals(outputClass.getSuperclass().getName()) &&
-                                SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null &&
-                                BeanUtils.getProperty(bean, field.getName()) == null)
-                        {
-                            Map<String, Object> rewrMap = prepareSubclassQuerryFields(field, currMap);
-                            List<Field> newsFields = prepareSubclassReflectionFields(field.getType(), rewrMap.keySet());
-                            BeanUtils.setProperty(bean, field.getName(), staticMapRersultSetToObject(field.getType(), rewrMap, newsFields));
-                        }
-                        else if (field.getType().isEnum() && BeanUtils.getProperty(bean, field.getName()) == null &&
-                                SysHelper.getClassNameFromAlias(columnName).equalsIgnoreCase(field.getName()) && columnValue != null)
-                        {
-                            Class clazz = field.getType();
-                            BeanUtils.setProperty(bean, field.getName(), Enum.valueOf(clazz, columnValue.toString()));
-                        }
-                    }
-                }
-                outputObject = bean;
-            }
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return outputObject;
-    }
-    */
 }

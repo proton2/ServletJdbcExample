@@ -11,6 +11,15 @@ public class User extends Model{
     private String login;
     private String password;
     private UserRole role;
+    private Detail subData;
+
+    public Detail getSubData() {
+        return subData;
+    }
+
+    public void setSubData(Detail subData) {
+        this.subData = subData;
+    }
 
     public User() {}
 
