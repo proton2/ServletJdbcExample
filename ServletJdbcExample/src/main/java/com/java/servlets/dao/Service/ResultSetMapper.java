@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by proton2 on 01.01.2017.
@@ -40,22 +39,13 @@ public class ResultSetMapper<T> {
         return resultMap;
     }
 
-    private static List<Field> getAllFields(Class<?> type) {
+    private static List<Field> getReflectionFields(Class<?> type) {
         List<Field> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(type.getDeclaredFields()));
         if (type.getSuperclass() != null && type.getSuperclass() != Object.class) {
-            fields.addAll(getAllFields(type.getSuperclass()));
+            fields.addAll(getReflectionFields(type.getSuperclass()));
         }
         return fields;
-    }
-
-    private static List<Field> prepareSubclassReflectionFields(Class<?> type, Set<String> nessesaryFields) {
-        List<Field> fields1 = new ArrayList<>();
-        fields1.addAll(Arrays.asList(type.getDeclaredFields()));
-        if (type.getSuperclass() != null && type.getSuperclass() != Object.class) {
-            fields1.addAll(prepareSubclassReflectionFields(type.getSuperclass(), nessesaryFields));
-        }
-        return fields1;
     }
 
     private static boolean checkIsSubclass(Class<?>clazz){
@@ -99,7 +89,7 @@ public class ResultSetMapper<T> {
     }
 
     public T mapRersultSetToObject(ResultSet rs, Class<T> outputClass) {
-        return mapRersultSetToObject(outputClass, copyResultSetToMap(rs), getAllFields(outputClass));
+        return mapRersultSetToObject(outputClass, copyResultSetToMap(rs), getReflectionFields(outputClass));
     }
 
     private T mapRersultSetToObject(Class outputClass, Map<String, Object> currMap, List<Field> fields) {
@@ -138,7 +128,7 @@ public class ResultSetMapper<T> {
                         {
                             Map<String, Object> subclassResultSet = prepareSubclassQuerryFields(field, currMap);
                             if(!subclassResultSet.isEmpty()) {
-                                List<Field> subclassFields = prepareSubclassReflectionFields(field.getType(), subclassResultSet.keySet());
+                                List<Field> subclassFields = getReflectionFields(field.getType());
                                 BeanUtils.setProperty(bean, field.getName(), mapRersultSetToObject(field.getType(), subclassResultSet, subclassFields));
                                 currMap.put(columnName, null);
                                 break;
@@ -155,7 +145,7 @@ public class ResultSetMapper<T> {
     }
 
     public static void putEntityToPreparedStatement(PreparedStatement ps, Object entity){
-        List<Field> fields = getAllFields(entity.getClass());
+        List<Field> fields = getReflectionFields(entity.getClass());
         int i=0;
         try {
             for (Field field : fields) {
