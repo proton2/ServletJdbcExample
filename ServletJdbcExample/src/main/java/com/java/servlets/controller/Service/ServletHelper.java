@@ -2,7 +2,7 @@ package com.java.servlets.controller.Service;
 
 import com.java.servlets.controller.LoginServlet;
 import com.java.servlets.dao.AuthorizationDao;
-import com.java.servlets.dao.DaoFactory;
+import com.java.servlets.dao.impl.UserDaoImpl;
 import com.java.servlets.model.Attach;
 import com.java.servlets.model.TaskStatus;
 import com.java.servlets.model.User;
@@ -49,7 +49,9 @@ public class ServletHelper {
         String userIdStr = request.getParameter("taskuser_id");
         if (userIdStr != null && !userIdStr.isEmpty()) {
             Long userId = Long.parseLong(userIdStr);
-            User user = (User) DaoFactory.getById(userId, User.class);
+            UserDaoImpl userDao = UserDaoImpl.getInstance();
+            User user = userDao.getById(userId);
+            //User user = (User) DaoFactory.getById(userId, User.class);
             wt.setTaskUser(user);
         }
 
@@ -58,7 +60,6 @@ public class ServletHelper {
         wt.setTaskStatus(request.getParameter("taskstatus") == null ?
                 null :
                 TaskStatus.values()[Integer.parseInt(request.getParameter("taskstatus"))]);
-
         try {
             Date taskdate = request.getParameter("taskDate") == null ? null :
                     new SimpleDateFormat("dd/MM/yyyy").parse(request.getParameter("taskDate"));

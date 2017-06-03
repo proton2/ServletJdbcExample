@@ -1,9 +1,9 @@
 package com.java.servlets.controller;
 
-import com.java.servlets.dao.DaoFactory;
+import com.java.servlets.dao.impl.UserDaoImpl;
+import com.java.servlets.dao.impl.UserViewDaoImpl;
+import com.java.servlets.dao.impl.WorkTaskViewDaoImpl;
 import com.java.servlets.model.User;
-import com.java.servlets.model.UserView;
-import com.java.servlets.model.WorkTaskView;
 import com.java.servlets.controller.Service.ServletHelper;
 
 import javax.servlet.RequestDispatcher;
@@ -29,15 +29,16 @@ public class UserController extends HttpServlet{
     		
     	if (action.equalsIgnoreCase("delete")){
     		Long userId = Long.parseLong(request.getParameter("id"));
-    		DaoFactory.delete(userId, User.class);
+			UserDaoImpl userDao = UserDaoImpl.getInstance();
+			userDao.delete(userId);
     		forward = LIST_USER2;
     	}
     	else if (action.equalsIgnoreCase("edit")){
     		forward = INSERT_OR_EDIT;
     		Long userId = Long.parseLong(request.getParameter("id"));
-    		User user = (User) DaoFactory.getById(userId, User.class);
+			User user = UserDaoImpl.getInstance().getById(userId);
 			request.setAttribute("user", user);
-			request.setAttribute("userTasks", DaoFactory.getListById(user.getId(), WorkTaskView.class));
+			request.setAttribute("userTasks", WorkTaskViewDaoImpl.getInstance().getListById(user.getId()));
     	}
 		else if (action.equalsIgnoreCase("insert")){
 			forward = INSERT_OR_EDIT;
@@ -45,7 +46,7 @@ public class UserController extends HttpServlet{
 		}
 		else if (action.equalsIgnoreCase("list")){
     		forward = LIST_USER;
-    		request.setAttribute("users", DaoFactory.getAll(UserView.class, 0, 0));
+    		request.setAttribute("users", UserViewDaoImpl.getInstance().getAll(0, 50));
     	} else {
     		forward = INSERT_OR_EDIT;
     	}
@@ -57,14 +58,14 @@ public class UserController extends HttpServlet{
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	User user1 = ServletHelper.getUserFromRequest(request);
     	if (user1.getId() == null){
-			DaoFactory.insert(user1);
+    		UserDaoImpl.getInstance().insert(user1);
     	}
     	else
     	{
-			DaoFactory.update(user1);
+    		UserDaoImpl.getInstance().update(user1);
     	}
     	RequestDispatcher view = request.getRequestDispatcher(LIST_USER);
-    	request.setAttribute("users", DaoFactory.getAll(UserView.class, 0, 0));
+    	request.setAttribute("users", UserViewDaoImpl.getInstance().getAll(0, 50));
     	view.forward(request, response);
     }
 }

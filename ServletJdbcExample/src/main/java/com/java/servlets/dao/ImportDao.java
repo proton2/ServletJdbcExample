@@ -20,7 +20,7 @@ public class ImportDao {
         Connection connection = DataSource.getInstance().getConnection();
         PreparedStatement ps = null;
         int[] updateCounts = null;
-        String insertSql = SqlXmlReader.getQuerryStr("sql.xml", "WorkTaskDao", "insertSql");
+        String insertSql = SqlXmlReader.getQuerryStr("WorkTaskDao", "insertSql");
         if (workTaskList!=null && !workTaskList.isEmpty()) {
             try {
                 connection.setAutoCommit(false);

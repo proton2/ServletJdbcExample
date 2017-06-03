@@ -1,5 +1,6 @@
 package com.java.servlets.dao.Service;
 
+import com.java.servlets.model.Model;
 import com.java.servlets.util.SysHelper;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -20,7 +21,7 @@ import java.util.Map;
  * Thank for idea
  * https://www.codeproject.com/tips/372152/mapping-jdbc-resultset-to-object-using-annotations
  */
-public class ResultSetMapper<T> {
+public class ResultSetMapper<T extends Model> {
 
     private static Map<String, Object> copyResultSetToMap(ResultSet rs) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -62,7 +63,7 @@ public class ResultSetMapper<T> {
     }
 
     private static Map<String, Object> prepareSubclassQuerryFields(Field field, Map<String, Object> currMap) {
-        Map<String, Object> newMap = new HashMap();
+        Map<String, Object> newMap = new HashMap<>();
         for (Map.Entry<String, Object> entry : currMap.entrySet()) {
             String name = entry.getKey();
             if (SysHelper.getClassNameFromAlias(name).equalsIgnoreCase(field.getName())) {

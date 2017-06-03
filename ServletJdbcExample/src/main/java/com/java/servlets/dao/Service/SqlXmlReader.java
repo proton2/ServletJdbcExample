@@ -20,7 +20,8 @@ public class SqlXmlReader {
     public SqlXmlReader() {
     }
 
-    public static String getQuerryStr(String fileName, String className, String querryName) {
+    public static String getQuerryStr(String className, String querryName) {
+        String fileName = "sql.xml";
         ClassLoader classLoader = SqlXmlReader.class.getClassLoader();
         File fXmlFile = new File(classLoader.getResource(fileName).getFile());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

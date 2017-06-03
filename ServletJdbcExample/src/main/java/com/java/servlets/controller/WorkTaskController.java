@@ -1,10 +1,14 @@
 package com.java.servlets.controller;
 
-import com.java.servlets.dao.DaoFactory;
 import com.java.servlets.dao.ImportDao;
+import com.java.servlets.dao.impl.AttachDaoImpl;
+import com.java.servlets.dao.impl.UserDaoImpl;
+import com.java.servlets.dao.impl.UserViewDaoImpl;
+import com.java.servlets.dao.impl.WorkNoteDaoImpl;
+import com.java.servlets.dao.impl.WorkTaskDaoImpl;
+import com.java.servlets.dao.impl.WorkTaskViewDaoImpl;
 import com.java.servlets.model.Attach;
 import com.java.servlets.model.User;
-import com.java.servlets.model.UserView;
 import com.java.servlets.model.WorkNote;
 import com.java.servlets.model.WorkTask;
 import com.java.servlets.model.WorkTaskView;
@@ -49,30 +53,30 @@ public class WorkTaskController extends HttpServlet {
 
         if (action.equalsIgnoreCase("delete")) {
             Long userId = Long.parseLong(request.getParameter("id"));
-            DaoFactory.delete(userId, WorkTask.class);
+            WorkTaskDaoImpl.getInstance().delete(userId);
             forward = LIST_WORKTASK_FORWARD;
         } else if (action.equalsIgnoreCase("edit")) {
             forward = INSERT_OR_EDIT;
             Long workTaskId = Long.parseLong(request.getParameter("id"));
-            WorkTask workTask = (WorkTask) DaoFactory.getById(workTaskId, WorkTask.class);
+            WorkTask workTask = WorkTaskDaoImpl.getInstance().getById(workTaskId);
             request.setAttribute("taskuser", workTask.getTaskUser());
             request.setAttribute("workTask", workTask);
-            request.setAttribute("attaches", DaoFactory.getListById(workTask.getId(), Attach.class));
-            request.setAttribute("notes", DaoFactory.getListById(workTask.getId(), WorkNote.class));
+            request.setAttribute("attaches", AttachDaoImpl.getInstance().getListById(workTask.getId()));
+            request.setAttribute("notes", WorkNoteDaoImpl.getInstance().getListById(workTask.getId()));
         } else if (action.equalsIgnoreCase("select_user")) {
             Long userId = Long.parseLong(request.getParameter("id"));
-            User user = (User) DaoFactory.getById(userId, User.class);
+            User user = UserDaoImpl.getInstance().getById(userId);
             WorkTask wt = (WorkTask) request.getSession().getAttribute("workTask");
             request.setAttribute("workTask", wt);
             request.setAttribute("taskuser", user);
-            if (wt.getId()!=null) {
-                request.setAttribute("attaches", DaoFactory.getListById(wt.getId(), Attach.class));
-                request.setAttribute("notes", DaoFactory.getListById(wt.getId(), WorkNote.class));
+            if (wt.getId() != null) {
+                request.setAttribute("attaches", AttachDaoImpl.getInstance().getListById(wt.getId()));
+                request.setAttribute("notes", WorkNoteDaoImpl.getInstance().getListById(wt.getId()));
             }
             forward = INSERT_OR_EDIT;
         } else if (action.equalsIgnoreCase("delete_attach")) {
             Long attachId = Long.parseLong(request.getParameter("attach_id"));
-            DaoFactory.delete(attachId, Attach.class);
+            AttachDaoImpl.getInstance().delete(attachId);
             String uploadFilePath = request.getServletContext().getInitParameter("uploads") + File.separator;
             String delfile = request.getParameter("att_filename");
             SysHelper.deleteFile(uploadFilePath + delfile);
@@ -84,35 +88,36 @@ public class WorkTaskController extends HttpServlet {
             Long wt_id = Long.parseLong(request.getParameter("worktask_id"));
             request.setAttribute("wt_id", wt_id);
             Long attachId = Long.parseLong(request.getParameter("attach_id"));
-            Attach attach = (Attach) DaoFactory.getById(attachId, Attach.class);
+            Attach attach = AttachDaoImpl.getInstance().getById(attachId);
             request.setAttribute("attach", attach);
             forward = INSERT_OR_EDIT_ATTACH;
         } else if (action.equalsIgnoreCase("insert_attach")) {
             Long wt_id = Long.parseLong(request.getParameter("worktask_id").isEmpty() ? "-1" : request.getParameter("worktask_id"));
-            if (wt_id!=-1) {
+            if (wt_id != -1) {
                 request.setAttribute("wt_id", wt_id);
                 forward = INSERT_OR_EDIT_ATTACH;
             }
         } else if (action.equalsIgnoreCase("list")) {
             forward = LIST_ITEMS;
-            if(request.getParameter("page") != null)
+            if (request.getParameter("page") != null)
                 page = Integer.parseInt(request.getParameter("page"));
-            List<WorkTaskView> items =
-                    (List<WorkTaskView>) DaoFactory.getAll(WorkTaskView.class, (page-1)*recordsPerPage, recordsPerPage);
-            int numOfRecords = DaoFactory.getNumOfRecords(WorkTaskView.class);
+
+            WorkTaskViewDaoImpl workTaskViewDao = WorkTaskViewDaoImpl.getInstance();
+            List<WorkTaskView> items = workTaskViewDao.getAll((page - 1) * recordsPerPage, recordsPerPage);
+            int numOfRecords = workTaskViewDao.getNumOfRecords("worktask");
             int noOfPages = (int) Math.ceil(numOfRecords * 1.0 / recordsPerPage);
             request.setAttribute("workTasks", items);
             request.setAttribute("noOfPages", noOfPages);
             request.setAttribute("currentPage", page);
         } else if (action.equalsIgnoreCase("open_comment")) {
             Long noteId = Long.parseLong(request.getParameter("note_id"));
-            WorkNote note = (WorkNote) DaoFactory.getById(noteId, WorkNote.class);
+            WorkNote note = WorkNoteDaoImpl.getInstance().getById(noteId);
             Long workTaskId = Long.parseLong(request.getParameter("worktask_id"));
             request.setAttribute("worknote", note);
             forward = EDIT_WORKTASK + workTaskId;
-        }else if (action.equalsIgnoreCase("delete_comment")) {
+        } else if (action.equalsIgnoreCase("delete_comment")) {
             Long noteId = Long.parseLong(request.getParameter("note_id"));
-            DaoFactory.delete(noteId, WorkNote.class);
+            WorkNoteDaoImpl.getInstance().delete(noteId);
             Long workTaskId = Long.parseLong(request.getParameter("worktask_id"));
             forward = EDIT_WORKTASK + workTaskId;
         } else {
@@ -129,16 +134,16 @@ public class WorkTaskController extends HttpServlet {
         if (buttonPressed.equalsIgnoreCase("Save")) {
             WorkTask wt = ServletHelper.getWorkTaskFromRequest(request);
             if (wt.getId() == null) {
-                DaoFactory.insert(wt);
+                WorkTaskDaoImpl.getInstance().insert(wt);
             } else {
-                DaoFactory.update(wt);
+                WorkTaskDaoImpl.getInstance().update(wt);
             }
             request.getSession().removeAttribute("workTask");
             response.sendRedirect(LIST_WORKTASK_REDIRECT);
         } else if (buttonPressed.equalsIgnoreCase("Set user")) {
             WorkTask wt = ServletHelper.getWorkTaskFromRequest(request);
             request.getSession().setAttribute("workTask", wt);
-            request.setAttribute("users", DaoFactory.getAll(UserView.class, 0, 0));
+            request.setAttribute("users", UserViewDaoImpl.getInstance().getAll(0, 0));
             forward = SELECT_USER;
             RequestDispatcher view = request.getRequestDispatcher(forward);
             view.forward(request, response);
@@ -146,15 +151,15 @@ public class WorkTaskController extends HttpServlet {
             WorkNote wn = ServletHelper.getWorkNoteFromRequest(request);
             if (!wn.getDescription().isEmpty() && !wn.getCaption().isEmpty()) {
                 if (wn.getId() == null) {
-                    DaoFactory.insert(wn);
+                    WorkNoteDaoImpl.getInstance().insert(wn);
                 } else {
-                    DaoFactory.update(wn);
+                    WorkNoteDaoImpl.getInstance().update(wn);
                 }
             }
             response.sendRedirect(EDIT_WORKTASK_REDIRECT + wn.getSubject().getId());
         } else if (buttonPressed.equalsIgnoreCase("Import")) {
             Collection<WorkTask> workTaskList = ServletHelper.importWorkTasks(request);
-            if (workTaskList!=null && !workTaskList.isEmpty()) {
+            if (workTaskList != null && !workTaskList.isEmpty()) {
                 ImportDao importDao = new ImportDao();
                 importDao.importCollection(workTaskList);
             }

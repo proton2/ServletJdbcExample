@@ -1,6 +1,6 @@
 package com.java.servlets.controller;
 
-import com.java.servlets.dao.DaoFactory;
+import com.java.servlets.dao.impl.AttachDaoImpl;
 import com.java.servlets.model.Attach;
 import com.java.servlets.controller.Service.ServletHelper;
 
@@ -35,12 +35,16 @@ public class AttachController extends HttpServlet {
         Attach attach = ServletHelper.getAttachFromRequest(request);
 
         if (attach.getFileName() != null && attach.getId() == null){
-            DaoFactory.insert(attach);
+            AttachDaoImpl attachDao = AttachDaoImpl.getInstance();
+            attachDao.insert(attach);
+            //DaoFactory.insert(attach);
             response.sendRedirect(EDIT_WORKTASK + attach.getWorkTask().getId());
         }
         else if ((attach.getFileName() != null && attach.getId() != null))
         {
-            DaoFactory.update(attach);
+            AttachDaoImpl attachDao = AttachDaoImpl.getInstance();
+            attachDao.update(attach);
+            //DaoFactory.update(attach);
             response.sendRedirect(EDIT_WORKTASK + attach.getWorkTask().getId());
         }
 

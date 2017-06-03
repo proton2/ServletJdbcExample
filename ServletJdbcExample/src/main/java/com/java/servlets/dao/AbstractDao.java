@@ -1,7 +1,9 @@
 package com.java.servlets.dao;
 
-import com.java.servlets.model.Model;
 import com.java.servlets.dao.Service.DataSource;
+import com.java.servlets.dao.Service.ResultSetMapper;
+import com.java.servlets.dao.Service.SqlXmlReader;
+import com.java.servlets.model.Model;
 import com.java.servlets.util.EHCacheManger;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -11,154 +13,134 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 /**
- * Created by proton2 on 24.12.2016.
+ * Created by proton2 on 03.06.2017.
  */
-abstract public class AbstractDao implements ModelDao {
-    private Long insertId;
-    private Connection connection;
+public class AbstractDao<T extends Model> implements Dao<T> {
 
-    abstract public void insertItem(Model item) throws SQLException;
-    abstract public void updateItem(Model item) throws SQLException;
+    private Class<T> type;
+    private DataSource dataSource;
 
-    @Override
-    public Long insert(Model item) {
-        try {
-            insertItem(item);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return insertId;
+    public Class<T> getType() {
+        return type;
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public AbstractDao(Class<T> type) {
+        this.type = type;
+        dataSource = DataSource.getInstance();
     }
 
     @Override
-    public void update(Model item) {
-        try {
-            updateItem(item);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void performDelete(Long itemId, String deleteSql){
-        cacheRemove(itemId);
-
-        Connection connection = DataSource.getInstance().getConnection();
-        PreparedStatement ps = null;
-        try {
-            ps = connection.prepareStatement(deleteSql);
-            ps.setLong(1, itemId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
-            if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
-        }
-    }
-
-    public PreparedStatement getPreparedStatement (String querry){
-        connection = DataSource.getInstance().getConnection();
-        PreparedStatement ps = null;
-        try {
-            ps = connection.prepareStatement(querry);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return ps;
-    }
-
-    public PreparedStatement getNavigablePreparedStatement (String querry){
-        connection = DataSource.getInstance().getConnection();
-        PreparedStatement ps = null;
-        try {
-            ps = connection.prepareStatement(querry, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return ps;
-    }
-
-    public boolean resultSetNext(ResultSet rs){
-        try {
-            return rs.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public void executeUpdate(PreparedStatement ps) {
-        try {
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
-            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
-        }
-    }
-
-    public ResultSet executeGetById(PreparedStatement ps, Long itemId){
-        ResultSet rs = null;
-        try {
-            ps.setLong(1, itemId);
-            rs = ps.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return rs;
-    }
-
-    public ResultSet executeGetAll(PreparedStatement ps, int offcet, int limit){
-        ResultSet rs = null;
-        try {
+    public List<T> getAll(int offcet, int limit) {
+        String getAllSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "getAll");
+        List<T> result = null;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(getAllSql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);) {
             ps.setInt(1, offcet);
             ps.setInt(2, limit);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            ResultSetMapper<T> resultSetMapper = new ResultSetMapper<>();
+            result = resultSetMapper.mapRersultSetToList(rs, type);
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return rs;
+        return result;
     }
 
-    public ResultSet executeGetAll(PreparedStatement ps){
-        ResultSet rs = null;
-        try {
-            rs = ps.executeQuery();
+    @Override
+    public T getById(Long itemId) {
+        T item = cacheGet(itemId);
+        if (item != null) return item;
+
+        String getSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "getById");
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(getSql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);) {
+            ps.setLong(1, itemId);
+            ResultSet rs = ps.executeQuery();
+            ResultSetMapper<T> resultSetMapper = new ResultSetMapper<>();
+            item = resultSetMapper.mapRersultSetToObject(rs, type);
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return rs;
+        cachePut(item);
+        return item;
     }
 
-    public void closeResultSet(PreparedStatement ps, ResultSet rs){
-        if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
-        if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
-        if (connection != null) try {connection.close();} catch (SQLException e) {e.printStackTrace();}
-    }
+    @Override
+    public void insert(T entity) {
+        String insertSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "insert");
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);) {
+            ResultSetMapper.putEntityToPreparedStatement(ps, entity);
+            ps.executeUpdate();
 
-    public Long getInsertId(String tableName) {
-        Connection connection = DataSource.getInstance().getConnection();
-        Statement statement = null;
-        ResultSet resultSet = null;
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT max(id) FROM " + tableName);
-            while (resultSet.next()) {
-                insertId = resultSet.getLong(1);
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                entity.setId(generatedKeys.getLong(1));
+            } else {
+                throw new SQLException("Creating user failed, no ID obtained.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) try {resultSet.close();} catch (SQLException e) {e.printStackTrace();}
-            if (statement != null) try {statement.close();} catch (SQLException e) {e.printStackTrace();}
-            try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
-        return insertId;
+        cachePut(entity);
     }
 
+    @Override
+    public void update(T entity) {
+        String updateSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "update");
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(updateSql);) {
+            ResultSetMapper.putEntityToPreparedStatement(ps, entity);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        cachePut(entity);
+    }
+
+    @Override
+    public void delete(Long id) {
+        String deleteSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "delete");
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(deleteSql);) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+            cacheRemove(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cachePut(T item) {
+        Cache cache = EHCacheManger.getCache();
+        cache.put(new Element(item.getId(), item));
+    }
+
+    private void cacheRemove(Long itemId) {
+        Cache cache = EHCacheManger.getCache();
+        cache.remove(itemId);
+    }
+
+    private T cacheGet(Long itemId) {
+        Cache cache = EHCacheManger.getCache();
+        Element element = cache.get(itemId);
+        if (element != null) {
+            return (T) element.getObjectValue();
+        }
+        return null;
+    }
+
+    @Override
     public int getNumOfRecords(String tableName) {
         Connection connection = DataSource.getInstance().getConnection();
         Statement statement = null;
@@ -178,29 +160,5 @@ abstract public class AbstractDao implements ModelDao {
             try {connection.close();} catch (SQLException e) {e.printStackTrace();}
         }
         return numOfRecords;
-    }
-
-    public void cachePut(Model item) {
-        Cache cache = EHCacheManger.getCache();
-        cache.put(new Element(item.getId(), item));
-    }
-
-    public void cacheRemove(Model item) {
-        Cache cache = EHCacheManger.getCache();
-        cache.remove(item.getId());
-    }
-
-    public void cacheRemove(Long itemId) {
-        Cache cache = EHCacheManger.getCache();
-        cache.remove(itemId);
-    }
-
-    public Model cacheGet(Long itemId){
-        Cache cache = EHCacheManger.getCache();
-        Element element = cache.get(itemId);
-        if (element != null) {
-            return (Model) element.getObjectValue();
-        }
-        return null;
     }
 }
