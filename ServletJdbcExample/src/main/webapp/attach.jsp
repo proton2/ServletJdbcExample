@@ -11,7 +11,8 @@
 
 <body>
 <br>
-	<form method="POST" action="AttachController" name="frmAddAttach" enctype="multipart/form-data">
+	<form method="POST" action="WorkTaskController" name="frmAddAttach" enctype="multipart/form-data">
+	<input type = "hidden" name="action" value="save_attach_file"/>
 	<table border=0>
 	<tr>
 		    <input type="hidden" readonly="readonly" name="id" value="<c:out value="${attach.id}" />" />
@@ -37,7 +38,7 @@
 	    <td><input type="file" name="attachFile"></td>
 	</tr>
 	<tr>
-	    <td><a href = "WorkTaskController?action=edit&id=<c:out value = "${wt_id}"/>">Return to worktask</a></td>
+	    <td><a href = "WorkTaskController?action=edit_worktask&id=<c:out value = "${wt_id}"/>">Return to worktask</a></td>
 	    <td><input type = "submit" value = "Save" name = "button"/></td>
 	</tr>
 	</table>

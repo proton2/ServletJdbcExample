@@ -10,9 +10,9 @@
 
 <table align="center">
 	<tr>
-		<td><a href = "WorkTaskController?action=list">WorkTask list</a></td>
-		<td><a href = "UserController?action=list">Users list</a></td>
-		<td><a href = "LoginServlet?action=logout">Log out</a> <c:out value="${sessionScope.user}"/></td>
+		<td><a href = "WorkTaskController?action=list_worktasks">WorkTask list</a></td>
+		<td><a href = "WorkTaskController?action=list_users">Users list</a></td>
+		<td><a href = "WorkTaskController?action=logout">Log out</a> <c:out value="${sessionScope.user}"/></td>
 	</tr>
 </table>
 </body>

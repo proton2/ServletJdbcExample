@@ -8,7 +8,7 @@
 <body>
         <%--For displaying Previous link except for the 1st page --%>
         <c:if test="${currentPage != 1}">
-            <td><a href="WorkTaskController?action=list&page=${currentPage - 1}">Previous</a></td>
+            <td><a href="WorkTaskController?action=list_worktasks&page=${currentPage - 1}">Previous</a></td>
         </c:if>
 
 
@@ -22,7 +22,7 @@
                             <td>${i}</td>
                         </c:when>
                         <c:otherwise>
-                            <td><a href="WorkTaskController?action=list&page=${i}">${i}</a></td>
+                            <td><a href="WorkTaskController?action=list_worktasks&page=${i}">${i}</a></td>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
@@ -31,7 +31,7 @@
 
         <%--For displaying Next link --%>
         <c:if test="${currentPage lt noOfPages}">
-            <td><a href="WorkTaskController?action=list&page=${currentPage + 1}">Next</a></td>
+            <td><a href="WorkTaskController?action=list_worktasks&page=${currentPage + 1}">Next</a></td>
         </c:if>
 </body>
 </html>

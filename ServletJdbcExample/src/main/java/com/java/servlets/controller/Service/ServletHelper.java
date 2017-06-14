@@ -1,6 +1,5 @@
 package com.java.servlets.controller.Service;
 
-import com.java.servlets.controller.LoginServlet;
 import com.java.servlets.dao.AuthorizationDao;
 import com.java.servlets.dao.impl.UserDaoImpl;
 import com.java.servlets.model.Attach;
@@ -36,7 +35,7 @@ import java.util.Iterator;
  */
 public class ServletHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SysHelper.class);
 
     public static WorkTask getWorkTaskFromRequest(HttpServletRequest request) {
         WorkTask wt = new WorkTask();

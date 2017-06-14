@@ -1,17 +1,18 @@
 package com.java.servlets.util;
 
-import com.java.servlets.controller.LoginServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Part;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Created by proton2 on 01.01.2017.
  */
 public class SysHelper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SysHelper.class);
 
     public static String getFieldNameFromAlias(String alias) {
         int i = alias.indexOf('_');
@@ -40,15 +41,8 @@ public class SysHelper {
 
     public static void deleteFile(String filename) {
         try {
-            File file = new File(filename);
-            if (file.exists()) {
-                if (file.delete()) {
-                    LOGGER.info(file.getName() + " is deleted!");
-                } else {
-                    LOGGER.info("Delete operation is failed.");
-                }
-            }
-        } catch (Exception e) {
+            Files.deleteIfExists(Paths.get(filename));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

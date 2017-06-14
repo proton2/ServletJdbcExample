@@ -32,6 +32,7 @@
     </script>
 
     <form method="POST" action="WorkTaskController" name="frmAddWokrTask">
+    <input type = "hidden" name="action" value="save_worktask"/>
     	<table border=0>
     	<tr>
     	    <input type="hidden" readonly="readonly" name="id" value="<c:out value="${workTask.id}" />" />
@@ -44,7 +45,7 @@
     	<tr>
     		<td> <input type = "submit" value = "Set user" name = "button"/>
     		<td>
-    		    <a href = "UserController?action=edit&id=<c:out value = "${taskuser.id}"/>">${taskuser}</a>
+    		    <a href = "WorkTaskController?action=edit_user&id=<c:out value = "${taskuser.id}"/>">${taskuser}</a>
     		</td>
     	</tr>
 
@@ -144,6 +145,7 @@
     <div id="tabs-2">
 
     	<form method="POST" action="WorkTaskController" name="frmAddWorkNote">
+    	<input type = "hidden" name="action" value="save_comment"/>
     	<table border=0>
     	<tr>
     	        <td>Note id : </td>

@@ -13,7 +13,8 @@
 <body>
 <jsp:include page="master.jsp"></jsp:include>
 <br>
-	<form method="POST" action="UserController" name="frmAddUser">
+	<form method="POST" action="WorkTaskController" name="frmAddUser">
+	<input type = "hidden" name="action" value="save_user"/>
 	<table border=0>
 	<tr>
 		    <input type="hidden" readonly="readonly" name="id" value="<c:out value="${user.id}" />" />
@@ -104,8 +105,8 @@
     					<td><c:out value="${workTask.caption}"/></td>
     					<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.taskDate}" /></td>
     					<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.deadLine}" /></td>
-    					<td><a href = "WorkTaskController?action=edit&id=<c:out value = "${workTask.id}"/>">Update</a></td>
-    					<td><a href = "WorkTaskController?action=delete&id=<c:out value = "${workTask.id}"/>">Delete</a></td>
+    					<td><a href = "WorkTaskController?action=edit_worktask&id=<c:out value = "${workTask.id}"/>">Update</a></td>
+    					<td><a href = "WorkTaskController?action=delete_worktask&id=<c:out value = "${workTask.id}"/>">Delete</a></td>
     				</tr>
     			</c:forEach>
     		</tbody>

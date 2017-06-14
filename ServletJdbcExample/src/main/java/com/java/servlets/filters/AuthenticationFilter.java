@@ -1,5 +1,7 @@
 package com.java.servlets.filters;
 
+import com.java.servlets.controller.PageURL;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +12,6 @@ import java.io.IOException;
  * Created by proton2 on 29.10.2016.
  */
 public class AuthenticationFilter implements Filter{
-    private static String LOGIN_PAGE = "/LoginServlet";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {}
@@ -23,7 +24,7 @@ public class AuthenticationFilter implements Filter{
         String uri = req.getRequestURI();
         HttpSession session = req.getSession(false);
         if((session == null || session.getAttribute("role") == null) && !(uri.endsWith("jsp") || uri.endsWith("LoginServlet"))){
-            RequestDispatcher view = request.getRequestDispatcher(LOGIN_PAGE);
+            RequestDispatcher view = request.getRequestDispatcher(PageURL.LOGIN_ACTION);
             view.forward(request, response);
         }else{
             chain.doFilter(req, resp);

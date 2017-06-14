@@ -31,12 +31,12 @@
 					<td><c:out value="${user.lastName}"/></td>
 					<td><c:out value="${user.caption}"/></td>
 					<td><c:out value="${user.email}"/></td>
-					<td><a href = "UserController?action=edit&id=<c:out value = "${user.id}"/>">Update</a></td>
-					<td><a href = "UserController?action=delete&id=<c:out value = "${user.id}"/>">Delete</a></td>
+					<td><a href = "WorkTaskController?action=edit_user&id=<c:out value = "${user.id}"/>">Update</a></td>
+					<td><a href = "WorkTaskController?action=delete_user&id=<c:out value = "${user.id}"/>">Delete</a></td>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
-	<p><a href = "UserController?action=insert">Add user</a></p>
+	<p><a href = "WorkTaskController?action=insert_user">Add user</a></p>
 </body>
 </html>

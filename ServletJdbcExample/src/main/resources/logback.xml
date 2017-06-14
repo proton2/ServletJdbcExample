@@ -17,7 +17,7 @@
     </appender>
 
 
-    <logger name="com.java.servlets.controller.LoginServlet" level="INFO" additivity="false">
+    <logger name="com.java.servlets.controller.WorkTaskController" level="INFO" additivity="false">
 		<appender-ref ref="LOGFILE" />
 	</logger>
     <logger name="com.java.servlets.listener.AppContextListener" level="INFO" additivity="false">

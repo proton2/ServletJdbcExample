@@ -33,19 +33,20 @@
     				<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.taskDate}" /></td>
     				<td><fmt:formatDate pattern="yyyy-MMM-dd" value="${workTask.deadLine}" /></td>
     				<td><c:out value="${workTask.taskStatus}"/></td>
-    				<td><a href = "WorkTaskController?action=edit&id=<c:out value = "${workTask.id}"/>">Update</a></td>
-    				<td><a href = "WorkTaskController?action=delete&id=<c:out value = "${workTask.id}"/>">Delete</a></td>
+    				<td><a href = "WorkTaskController?action=edit_worktask&id=<c:out value = "${workTask.id}"/>">Update</a></td>
+    				<td><a href = "WorkTaskController?action=delete_worktask&id=<c:out value = "${workTask.id}"/>">Delete</a></td>
     			</tr>
     		</c:forEach>
     	</tbody>
     </table>
 
     <jsp:include page="pagesWorkTask.jsp"></jsp:include>
-    <p><a href = "WorkTaskController?action=">Add workTask</a></p>
+    <p><a href = "WorkTaskController?action=insert_worktask">Add workTask</a></p>
 
     <form name="frmImportWorkNote" method="POST" action="WorkTaskController" enctype="multipart/form-data">
+    <input type = "hidden" name="action" value="import"/>
     <input type="file" name="excelFile"/>
-    <input type = "submit" value = "Import" name = "button"/>
+    <input type = "submit" value = "Import from excel" name = "button"/>
     </form>
 
 </body>

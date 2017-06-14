@@ -4,7 +4,8 @@
     <title>Login</title>
 </head>
 <body>
-    <form name="loginForm" method="POST" action="LoginServlet">
+    <form name="loginForm" method="POST" action="WorkTaskController">
+    <input type = "hidden" name="action" value="login"/>
         Login:<br/>
         <input type="text" name="login" value=""/>
         <br/>Password:<br/>
