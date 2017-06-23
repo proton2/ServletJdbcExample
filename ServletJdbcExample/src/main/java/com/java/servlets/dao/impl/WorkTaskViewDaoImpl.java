@@ -5,6 +5,7 @@ import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.dao.Service.SqlXmlReader;
 import com.java.servlets.model.WorkTaskView;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,7 +30,7 @@ public class WorkTaskViewDaoImpl extends AbstractDao<WorkTaskView> {
         return crudDAO;
     }
 
-    public List<WorkTaskView> getListById(Long itemId) {
+    public List<WorkTaskView> getListById(Long itemId) throws IOException {
         String getListById = SqlXmlReader.getQuerryStr(getType().getSimpleName(), "getUserWorkTasks");
         List<WorkTaskView> result = null;
         try (Connection conn = getDataSource().getConnection();
@@ -42,6 +43,7 @@ public class WorkTaskViewDaoImpl extends AbstractDao<WorkTaskView> {
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
 
         return result;

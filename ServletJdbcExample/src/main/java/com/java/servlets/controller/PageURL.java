@@ -9,14 +9,14 @@ public interface PageURL {
     String ERROR_PAGE = "/error.jsp";
     String DOWNLOAD = "/download?downloadfile=";
 
-    String EDIT_WORKTASK = "/WorkTaskController?action=edit_worktask&id=";
-    String LIST_WORKTASK_FORWARD = "/WorkTaskController?action=list_worktasks";
-    String LIST_WORKTASKS = "/listWorkTask.jsp";
+    String LIST_WORKTASK_ACTION = "/WorkTaskController?action=list_worktasks";
+    String LIST_WORKTASK = "/listWorkTask.jsp";
+    String EDIT_WORKTASK_ACTION = "/WorkTaskController?action=edit_worktask&id=";
     String INSERT_OR_EDIT_WORKTASK = "/workTask.jsp";
     String INSERT_OR_EDIT_ATTACH = "/attach.jsp";
 
     String SELECT_USER = "/selectUser.jsp";
     String EDIT_USER = "/user.jsp";
-    String LIST_USERS = "/WorkTaskController?action=list_users";
+    String LIST_USER_ACTION = "/WorkTaskController?action=list_users";
     String LIST_USER = "/listUser.jsp";
 }

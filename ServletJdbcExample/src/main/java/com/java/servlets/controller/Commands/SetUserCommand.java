@@ -6,13 +6,14 @@ import com.java.servlets.model.WorkTask;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 14.06.2017.
  */
 public class SetUserCommand implements com.java.servlets.controller.ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         WorkTask wt = ServletHelper.getWorkTaskFromRequest(req);
         req.getSession().setAttribute("workTask", wt);
         new ListUsersCommand().execute(req, resp);

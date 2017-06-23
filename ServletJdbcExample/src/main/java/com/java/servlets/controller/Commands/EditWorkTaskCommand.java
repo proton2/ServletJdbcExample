@@ -9,13 +9,14 @@ import com.java.servlets.model.WorkTask;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 13.06.2017.
  */
 public class EditWorkTaskCommand implements ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Long workTaskId = Long.parseLong(req.getParameter("id"));
         WorkTask workTask = WorkTaskDaoImpl.getInstance().getById(workTaskId);
         req.setAttribute("taskuser", workTask.getTaskUser());

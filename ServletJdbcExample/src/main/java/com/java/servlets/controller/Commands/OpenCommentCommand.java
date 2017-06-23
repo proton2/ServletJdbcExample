@@ -7,6 +7,7 @@ import com.java.servlets.model.WorkNote;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 14.06.2017.
@@ -14,11 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 public class OpenCommentCommand implements ActionCommand {
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Long noteId = Long.parseLong(req.getParameter("note_id"));
         WorkNote note = WorkNoteDaoImpl.getInstance().getById(noteId);
         Long workTaskId = Long.parseLong(req.getParameter("worktask_id"));
         req.setAttribute("worknote", note);
-        return PageURL.EDIT_WORKTASK + workTaskId;
+        return PageURL.EDIT_WORKTASK_ACTION + workTaskId;
     }
 }

@@ -7,13 +7,14 @@ import com.java.servlets.model.Attach;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 14.06.2017.
  */
 public class EditAttachCommand implements ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Long wt_id = Long.parseLong(req.getParameter("worktask_id"));
         req.setAttribute("wt_id", wt_id);
         Long attachId = Long.parseLong(req.getParameter("attach_id"));

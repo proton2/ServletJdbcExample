@@ -7,6 +7,7 @@ import com.java.servlets.model.WorkTaskView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class ListWorktasksCommand implements ActionCommand {
     private int recordsPerPage = 5;
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req.getParameter("page") != null)
             page = Integer.parseInt(req.getParameter("page"));
 
@@ -30,6 +31,6 @@ public class ListWorktasksCommand implements ActionCommand {
         req.setAttribute("noOfPages", noOfPages);
         req.setAttribute("currentPage", page);
 
-        return PageURL.LIST_WORKTASKS;
+        return PageURL.LIST_WORKTASK;
     }
 }

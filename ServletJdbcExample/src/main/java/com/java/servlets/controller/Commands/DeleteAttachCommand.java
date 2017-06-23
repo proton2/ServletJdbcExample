@@ -8,18 +8,19 @@ import com.java.servlets.util.SysHelper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 14.06.2017.
  */
 public class DeleteAttachCommand implements ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp){
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Long attachId = Long.parseLong(req.getParameter("attach_id"));
         AttachDaoImpl.getInstance().delete(attachId);
         String uploadFilePath = req.getServletContext().getInitParameter("uploads") + File.separator;
         String delfile = req.getParameter("att_filename");
         SysHelper.deleteFile(uploadFilePath + delfile);
-        return PageURL.EDIT_WORKTASK + req.getParameter("worktask_id");
+        return PageURL.EDIT_WORKTASK_ACTION + req.getParameter("worktask_id");
     }
 }

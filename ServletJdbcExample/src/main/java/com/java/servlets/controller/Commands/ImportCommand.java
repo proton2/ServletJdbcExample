@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 public class ImportCommand implements com.java.servlets.controller.ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String buttonPressed = req.getParameter("button");
         if (buttonPressed.equalsIgnoreCase("Import from excel")) {
             Collection<WorkTask> workTaskList = null;
@@ -29,7 +29,7 @@ public class ImportCommand implements com.java.servlets.controller.ActionCommand
                 ImportDao importDao = new ImportDao();
                 importDao.importCollection(workTaskList);
             }
-            return PageURL.LIST_WORKTASK_FORWARD;
+            return PageURL.LIST_WORKTASK_ACTION;
         }
         return PageURL.ERROR_PAGE;
     }

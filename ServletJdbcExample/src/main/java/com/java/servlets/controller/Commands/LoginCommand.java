@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 13.06.2017.
@@ -18,7 +19,7 @@ public class LoginCommand implements ActionCommand{
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginCommand.class);
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
         if (login==null || password==null){
@@ -34,7 +35,7 @@ public class LoginCommand implements ActionCommand{
             session.setAttribute("role", role);
             session.setMaxInactiveInterval(30 * 60);
             LOGGER.info(String.format("Login successfull: login = %s, role: %s", login, session.getAttribute("role")));
-            return PageURL.LIST_WORKTASK_FORWARD;
+            return PageURL.LIST_WORKTASK_ACTION;
         } else {
             LOGGER.info(String.format("Login unsuccessfull: login = %s, password: %s.", login, password));
             return PageURL.LOGIN_PAGE;

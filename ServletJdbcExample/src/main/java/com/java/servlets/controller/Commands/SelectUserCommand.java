@@ -10,13 +10,14 @@ import com.java.servlets.model.WorkTask;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by b.yacenko on 14.06.2017.
  */
 public class SelectUserCommand implements ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Long userId = Long.parseLong(req.getParameter("id"));
         User user = UserDaoImpl.getInstance().getById(userId);
         WorkTask wt = (WorkTask) req.getSession().getAttribute("workTask");

@@ -8,6 +8,7 @@ import com.java.servlets.util.EHCacheManger;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,7 +38,7 @@ public class AbstractDao<T extends Model> implements Dao<T> {
     }
 
     @Override
-    public List<T> getAll(int offcet, int limit) {
+    public List<T> getAll(int offcet, int limit) throws IOException {
         String getAllSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "getAll");
         List<T> result = null;
         try (Connection conn = dataSource.getConnection();
@@ -50,12 +51,13 @@ public class AbstractDao<T extends Model> implements Dao<T> {
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
         return result;
     }
 
     @Override
-    public T getById(Long itemId) {
+    public T getById(Long itemId) throws IOException {
         T item = cacheGet(itemId);
         if (item != null) return item;
 
@@ -70,13 +72,14 @@ public class AbstractDao<T extends Model> implements Dao<T> {
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
         cachePut(item);
         return item;
     }
 
     @Override
-    public void insert(T entity) {
+    public void insert(T entity) throws IOException {
         String insertSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "insert");
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);) {
@@ -87,16 +90,17 @@ public class AbstractDao<T extends Model> implements Dao<T> {
             if (generatedKeys.next()) {
                 entity.setId(generatedKeys.getLong(1));
             } else {
-                throw new SQLException("Creating user failed, no ID obtained.");
+                throw new IOException("Creating user failed, no ID obtained.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
         cachePut(entity);
     }
 
     @Override
-    public void update(T entity) {
+    public void update(T entity) throws IOException {
         String updateSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "update");
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(updateSql);) {
@@ -104,12 +108,13 @@ public class AbstractDao<T extends Model> implements Dao<T> {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
         cachePut(entity);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws IOException {
         String deleteSql = SqlXmlReader.getQuerryStr(type.getSimpleName(), "delete");
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(deleteSql);) {
@@ -118,6 +123,7 @@ public class AbstractDao<T extends Model> implements Dao<T> {
             cacheRemove(id);
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -141,7 +147,7 @@ public class AbstractDao<T extends Model> implements Dao<T> {
     }
 
     @Override
-    public int getNumOfRecords(String tableName) {
+    public int getNumOfRecords(String tableName) throws IOException {
         Connection connection = DataSource.getInstance().getConnection();
         Statement statement = null;
         ResultSet resultSet = null;
@@ -154,6 +160,7 @@ public class AbstractDao<T extends Model> implements Dao<T> {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         } finally {
             if (resultSet != null) try {resultSet.close();} catch (SQLException e) {e.printStackTrace();}
             if (statement != null) try {statement.close();} catch (SQLException e) {e.printStackTrace();}

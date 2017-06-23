@@ -5,6 +5,7 @@ import com.java.servlets.dao.Service.ResultSetMapper;
 import com.java.servlets.dao.Service.SqlXmlReader;
 import com.java.servlets.model.Attach;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +29,7 @@ public class AttachDaoImpl extends AbstractDao<Attach> {
         return crudDAO;
     }
 
-    public List<Attach> getListById(Long itemId) {
+    public List<Attach> getListById(Long itemId) throws IOException {
         String getListById = SqlXmlReader.getQuerryStr(getType().getSimpleName(), "getListById");
         List<Attach> result = null;
         try (Connection conn = getDataSource().getConnection();
@@ -40,6 +41,7 @@ public class AttachDaoImpl extends AbstractDao<Attach> {
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
 
         return result;

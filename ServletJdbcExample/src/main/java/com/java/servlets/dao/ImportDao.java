@@ -4,6 +4,7 @@ import com.java.servlets.model.WorkTask;
 import com.java.servlets.dao.Service.DataSource;
 import com.java.servlets.dao.Service.SqlXmlReader;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -16,7 +17,7 @@ public class ImportDao {
 
     public ImportDao(){}
 
-    public int importCollection(Collection<WorkTask> workTaskList){
+    public int importCollection(Collection<WorkTask> workTaskList) throws IOException {
         Connection connection = DataSource.getInstance().getConnection();
         PreparedStatement ps = null;
         int[] updateCounts = null;
@@ -41,8 +42,10 @@ public class ImportDao {
                     connection.rollback();
                 } catch (SQLException e1) {
                     e1.printStackTrace();
+                    throw new IOException(e1.getMessage());
                 }
                 e.printStackTrace();
+                throw new IOException(e.getMessage());
             }finally {
                 if (ps != null) try {ps.close();} catch (SQLException e1) {e1.printStackTrace();}
                 try {connection.close();} catch (SQLException e2) {e2.printStackTrace();}

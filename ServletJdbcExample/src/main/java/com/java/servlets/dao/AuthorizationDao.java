@@ -3,6 +3,7 @@ package com.java.servlets.dao;
 import com.java.servlets.model.UserRole;
 import com.java.servlets.dao.Service.DataSource;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ public class AuthorizationDao {
     public AuthorizationDao() {
     }
 
-    public UserRole checkAccess(String login, String password) {
+    public UserRole checkAccess(String login, String password) throws IOException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection connection = DataSource.getInstance().getConnection();
@@ -33,6 +34,7 @@ public class AuthorizationDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         } finally {
             if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
             if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}
@@ -42,7 +44,7 @@ public class AuthorizationDao {
         return null;
     }
 
-    public Long getUserId(String login) {
+    public Long getUserId(String login) throws IOException {
         Long id = -1l;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -57,6 +59,7 @@ public class AuthorizationDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new IOException(e.getMessage());
         } finally {
             if (rs != null) try {rs.close();} catch (SQLException e) {e.printStackTrace();}
             if (ps != null) try {ps.close();} catch (SQLException e) {e.printStackTrace();}

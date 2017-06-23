@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class SaveAttachFileCommand implements ActionCommand {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Attach attach = null;
         try {
             attach = ServletHelper.getAttachFromRequest(req);
@@ -27,12 +27,12 @@ public class SaveAttachFileCommand implements ActionCommand {
 
         if (attach.getFileName() != null && attach.getId() == null){
             attachDao.insert(attach);
-            return PageURL.EDIT_WORKTASK + attach.getWorkTask().getId();
+            return PageURL.EDIT_WORKTASK_ACTION + attach.getWorkTask().getId();
         }
         else if ((attach.getFileName() != null && attach.getId() != null))
         {
             attachDao.update(attach);
-            return PageURL.EDIT_WORKTASK + attach.getWorkTask().getId();
+            return PageURL.EDIT_WORKTASK_ACTION + attach.getWorkTask().getId();
         }
 
         if (attach.getFileName() == null){

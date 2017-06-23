@@ -37,7 +37,7 @@ public class ServletHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SysHelper.class);
 
-    public static WorkTask getWorkTaskFromRequest(HttpServletRequest request) {
+    public static WorkTask getWorkTaskFromRequest(HttpServletRequest request) throws IOException {
         WorkTask wt = new WorkTask();
 
         String id = request.getParameter("id");
@@ -50,7 +50,6 @@ public class ServletHelper {
             Long userId = Long.parseLong(userIdStr);
             UserDaoImpl userDao = UserDaoImpl.getInstance();
             User user = userDao.getById(userId);
-            //User user = (User) DaoFactory.getById(userId, User.class);
             wt.setTaskUser(user);
         }
 
