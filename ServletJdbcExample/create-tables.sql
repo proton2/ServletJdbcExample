@@ -18,6 +18,8 @@ create table if not exists public.detail (
 create table if not exists public.usertable (
 	id bigint not null default nextval('hibernate_sequence'::regclass),
 	caption varchar(255),
+	creation_time timestamp,
+	update_time timestamp,
 	firstname varchar(255),
 	lastname varchar(255),
 	email varchar(255),
@@ -73,6 +75,26 @@ create table if not exists public.WorkNote (
     REFERENCES public.usertable (id) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+create function set_creation_time() returns trigger as $creation_time$
+begin
+    new.creation_time:=current_timestamp;
+    return new;
+end;
+$creation_time$ language plpgsql;
+
+create function set_update_time() returns trigger as $update_time$
+begin
+    new.update_time:=current_timestamp;
+    return new;
+end;
+$update_time$ language plpgsql;
+
+create trigger creation_time before insert on usertable
+for each row execute procedure set_creation_time();
+
+create trigger update_time before update on usertable
+for each row execute procedure set_update_time();
 
 insert into public.detail (notice) values ('value 1');
 insert into public.detail (notice) values ('value 2');
