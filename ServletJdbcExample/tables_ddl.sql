@@ -13,13 +13,13 @@ ALTER TABLE dev.hibernate_sequence
   OWNER TO postgres;
 
 create table if not exists dev.detail (
-	id bigint not null default nextval('hibernate_sequence'::regclass),
+	id bigint not null default nextval('dev.hibernate_sequence'::regclass),
 	notice varchar(255),
 	CONSTRAINT detailpk PRIMARY KEY (id)
 );
 
 create table if not exists dev.usertable (
-	id bigint not null default nextval('hibernate_sequence'::regclass),
+	id bigint not null default nextval('dev.hibernate_sequence'::regclass),
 	caption varchar(255),
 	creation_time timestamp,
 	update_time timestamp,
@@ -38,7 +38,7 @@ create table if not exists dev.usertable (
 );
 
 create table if not exists dev.worktask(
-  id bigint not null default nextval('hibernate_sequence'::regclass),
+  id bigint not null default nextval('dev.hibernate_sequence'::regclass),
   caption varchar(255),
   deadline timestamp without time zone,
   taskcontext varchar(255),
@@ -52,7 +52,7 @@ create table if not exists dev.worktask(
 );
 
 create table if not exists dev.attach (
-	id bigint not null default nextval('hibernate_sequence'::regclass),
+	id bigint not null default nextval('dev.hibernate_sequence'::regclass),
 	filename varchar(255) UNIQUE,
 	caption varchar(512),
 	worktask_id bigint,
@@ -63,7 +63,7 @@ create table if not exists dev.attach (
 );
 
 create table if not exists dev.WorkNote (
-	id bigint not null default nextval('hibernate_sequence'::regclass),
+	id bigint not null default nextval('dev.hibernate_sequence'::regclass),
 	caption varchar(255),
 	noteDate timestamp without time zone,
 	description varchar(512),
